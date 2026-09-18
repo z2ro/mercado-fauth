@@ -18,7 +18,7 @@ from backend.app.classification.resolver import UnresolvedClassification, resolv
 from backend.app.classification.rules import RuleBasedProductClassifier
 from backend.app.config import ClassificationSettings, ROOT, classification_settings
 from backend.app.layout.planner import plan_layout
-from backend.app.layout.rules import hard_rules_valid
+from backend.app.layout.rules import hard_rules_valid, rectangles_hard_rules_valid
 from backend.app.models.campaign import BannerRequest, ResolvedBannerRequest
 
 
@@ -264,7 +264,10 @@ def test_auto_banner_offline(tmp_path,monkeypatch):
     resolved,meta=run(resolve_products(request))
     spec=plan_layout(resolved)
     by_id={p.id:p for p in resolved.products}
-    assert hard_rules_valid([by_id[p.product_id] for p in spec.products])
+    if hasattr(spec, 'placements'):
+        assert rectangles_hard_rules_valid(spec.placements, by_id)
+    else:
+        assert hard_rules_valid([by_id[p.product_id] for p in spec.products])
     assert all(m.source=='rule' for m in meta.values())
     for old,new in zip(request.products,resolved.products):
         assert old.model_dump(exclude={'category','subcategory'})==new.model_dump(exclude={'category','subcategory'})

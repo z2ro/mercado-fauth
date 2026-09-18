@@ -74,11 +74,26 @@ def grouped_accuracy(rows: list[dict], field: str, values: tuple[str, ...]) -> d
 
 
 def rule_known_analysis(rows: list[dict]) -> dict:
-    known=[r for r in rows if r['rule_known']]
-    unknown=[r for r in rows if not r['rule_known']]
-    return {'rule_known_count':len(known),'rule_unknown_count':len(unknown),
-            'accuracy_rule_known':safe_div(sum(r['correct'] for r in known),len(known)),
-            'accuracy_rule_unknown':safe_div(sum(r['correct'] for r in unknown),len(unknown))}
+    matched = [r for r in rows if r.get('rule_matched', r['rule_known'])]
+    unmatched = [r for r in rows if not r.get('rule_matched', r['rule_known'])]
+    strong = [r for r in rows if r.get('rule_strong', r['rule_known'])]
+    without_strong = [r for r in rows if not r.get('rule_strong', r['rule_known'])]
+    accuracy = lambda group: safe_div(sum(r['correct'] for r in group), len(group))
+    return {
+        'rule_matched_count': len(matched),
+        'rule_unmatched_count': len(unmatched),
+        'rule_strong_count': len(strong),
+        'without_strong_rule_count': len(without_strong),
+        'accuracy_rule_matched': accuracy(matched),
+        'accuracy_rule_unmatched': accuracy(unmatched),
+        'accuracy_rule_strong': accuracy(strong),
+        'accuracy_without_strong_rule': accuracy(without_strong),
+        # Compatibility names retained for existing reports and consumers.
+        'rule_known_count': len(matched),
+        'rule_unknown_count': len(unmatched),
+        'accuracy_rule_known': accuracy(matched),
+        'accuracy_rule_unknown': accuracy(unmatched),
+    }
 
 
 def subcategory_accuracy(rows: list[dict]) -> float | None:

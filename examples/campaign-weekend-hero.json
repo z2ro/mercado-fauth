@@ -1,5 +1,5 @@
 {
-  "template": "supermarket_12",
+  "template": "weekend_hero",
   "campaign": {
     "title": "Ofertas da Semana",
     "valid_until": "20/09/2026",
@@ -73,7 +73,7 @@
       "category": "mercearia",
       "subcategory": "graos",
       "image": "assets/products/mercearia.png",
-      "featured": false
+      "featured": true
     },
     {
       "id": "p007",
@@ -95,7 +95,7 @@
       "category": "bebidas",
       "subcategory": "refrigerantes",
       "image": "assets/products/bebidas.png",
-      "featured": false
+      "featured": true
     },
     {
       "id": "p009",

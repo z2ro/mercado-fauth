@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>{{ campaign.title }}</title>
+  <style>{{ design_tokens | safe }}{{ css | safe }}</style>
+</head>
+<body>
+<main class="banner price-attack">
+  <header class="attack-header">
+    <div class="brand-block"><span class="brand-mark">MF</span><strong data-fit>{{ campaign.brand }}</strong></div>
+    <h1 data-fit>{{ campaign.title }}</h1>
+    <div class="date-block"><span>ATÉ</span><strong>{{ campaign.valid_until }}</strong></div>
+  </header>
+  <div class="attack-strip"><strong>PREÇOS EM DESTAQUE</strong><span>CONSULTE AS UNIDADES NOS PRODUTOS</span></div>
+  <section class="products" aria-label="Preços promocionais"
+           style="--grid-columns:{{ design.grid_columns }};--grid-rows:{{ design.grid_rows }}">
+    {% for card in cards %}
+    <article class="price-card role-{{ card.placement.role }} zone-{{ card.placement.zone }}{% if card.product.featured %} marked-featured{% endif %}"
+             data-product-id="{{ card.product.id }}" data-role="{{ card.placement.role }}"
+             style="grid-column:{{ card.grid_column }} / span {{ card.placement.w }};grid-row:{{ card.grid_row }} / span {{ card.placement.h }};--image-scale:{{ card.placement.image_scale }};--price-scale:{{ card.placement.price_scale }}">
+      <div class="product-visual">
+        {% if card.image %}<img class="asset-{{ card.image.shape }}" src="{{ card.image.data_uri }}" alt="{{ card.product.name }}">
+        {% else %}<div class="placeholder"><strong>▧</strong><span>IMAGEM INDISPONÍVEL</span></div>{% endif %}
+      </div>
+      <div class="price-details">
+        <span class="price-label">{% if card.placement.role == 'featured' %}DESTAQUE{% else %}OFERTA{% endif %}</span>
+        <h2 data-fit>{{ card.product.name }}</h2>
+        <div class="price" data-fit aria-label="R$ {{ card.price.integer }},{{ card.price.decimal }} {{ card.product.unit }}">
+          <span class="currency">R$</span><strong class="integer">{{ card.price.integer }}</strong><span class="decimal">,{{ card.price.decimal }}</span>
+        </div>
+        <span class="unit">{{ card.product.unit }}</span>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+  <footer class="attack-footer">
+    <strong data-fit>{{ campaign.brand }}</strong>
+    <span data-fit>{{ campaign.address }}</span>
+    <span data-fit>{{ campaign.phone }}</span>
+    <span data-fit>{{ campaign.instagram }}</span>
+  </footer>
+</main>
+</body>
+</html>

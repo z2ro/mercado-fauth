@@ -4,7 +4,7 @@ from pathlib import Path
 
 from .metrics import CATEGORIES, UNRESOLVED
 
-CSV_FIELDS=('run','mode','product_id','name','unit','difficulty','rule_known','expected_category','predicted_category','expected_subcategory','predicted_subcategory','confidence','source','correct','resolved')
+CSV_FIELDS=('run','mode','product_id','name','unit','difficulty','rule_known','rule_matched','rule_strong','expected_category','predicted_category','expected_subcategory','predicted_subcategory','confidence','source','correct','resolved')
 
 
 def _safe(value):
@@ -41,9 +41,12 @@ def markdown_report(report:dict,errors:list[dict])->str:
            f"- Model: `{report['configuration']['model'] or 'unavailable'}`",
            f"- Batch size: {report['configuration']['batch_size']}",
            f"- Runs: {report['configuration']['runs']}",
+           f"- Real provider status: `{report.get('real_provider_eval','NOT_RUN')}`",
+           f"- Provider skip reason: `{report.get('provider_skip_reason') or 'none'}`",
            f"- Fake provider is infrastructure only: {report['configuration']['fake_is_not_quality_eval']}", '',
            '## Dataset','',f"- Products: {report['dataset']['total_products']}",
-           f"- Rule known: {report['dataset']['rule_known_count']}; unknown: {report['dataset']['rule_unknown_count']}", '']
+           f"- Rule matched/unmatched: {report['dataset'].get('rule_matched_count',report['dataset'].get('rule_known_count',0))}/{report['dataset'].get('rule_unmatched_count',report['dataset'].get('rule_unknown_count',0))}",
+           f"- Rule strong/without strong: {report['dataset'].get('rule_strong_count',0)}/{report['dataset'].get('rule_without_strong_count',0)}", '']
     for title,key in [('Rule Based','rule_based'),('AI','ai'),('Hybrid','hybrid')]:
         lines += [f'## {title}','']
         mode=report[key]
@@ -59,10 +62,10 @@ def markdown_report(report:dict,errors:list[dict])->str:
     for key in ('rule_based','ai','hybrid'):
         if report[key] is None:continue
         for difficulty,m in report[key]['difficulty_metrics'].items():lines.append(f"| {key} | {difficulty} | {m['accuracy']:.3f} | {m['total_products']} |")
-    lines += ['', '## Rule Known vs Unknown','','| Mode | Known | Unknown | Accuracy known | Accuracy unknown |','|---|---:|---:|---:|---:|']
+    lines += ['', '## Rule Known vs Unknown','','| Mode | Matched | Unmatched | Strong | Without strong | Acc matched | Acc unmatched | Acc without strong |','|---|---:|---:|---:|---:|---:|---:|---:|']
     for key in ('rule_based','ai','hybrid'):
         if report[key] is None:continue
-        m=report[key]['rule_known_analysis'];lines.append(f"| {key} | {m['rule_known_count']} | {m['rule_unknown_count']} | {m['accuracy_rule_known']:.3f} | {m['accuracy_rule_unknown']:.3f} |")
+        m=report[key]['rule_known_analysis'];lines.append(f"| {key} | {m['rule_matched_count']} | {m['rule_unmatched_count']} | {m['rule_strong_count']} | {m['without_strong_rule_count']} | {m['accuracy_rule_matched']:.3f} | {m['accuracy_rule_unmatched']:.3f} | {m['accuracy_without_strong_rule']:.3f} |")
     lines += ['', '## Confusion Matrix','',f"Primary mode: `{report['confusion_matrix_mode']}`",'', '| Expected \\ Predicted | '+' | '.join((*CATEGORIES,UNRESOLVED))+' |','|'+'---|'*(len(CATEGORIES)+2)]
     matrix=report['confusion_matrix']
     for expected in CATEGORIES:lines.append('| '+expected+' | '+' | '.join(str(matrix[expected][p]) for p in (*CATEGORIES,UNRESOLVED))+' |')
@@ -73,7 +76,10 @@ def markdown_report(report:dict,errors:list[dict])->str:
     for t in ca['thresholds']:lines.append(f"| {t['threshold']:.2f} | {t['accepted']} | {t['rejected']} | {t['coverage']:.3f} | {t['correct_accepted']} | {t['accuracy_among_accepted']:.3f} |")
     lines += ['', '## Latency','']
     for key in ('rule_based','ai','hybrid'):
-        if report[key] is not None:lines.append(f"- {key}: {report[key]['latency']['total_time']:.3f}s total; p50 {report[key]['latency']['p50']}; p95 {report[key]['latency']['p95']}s")
+        if report[key] is not None:
+            latency=report[key]['latency']
+            lines.append(f"- {key}: {latency['total_time']:.3f}s total, {latency.get('evaluation_batch_count',latency['batch_count'])} evaluation batches; {latency['provider_call_count']} provider calls, provider p50 {latency['provider_latency_p50']}, p95 {latency['provider_latency_p95']}s.")
+    lines += ['', '## Provider Calls','',json.dumps(report.get('provider_metrics',{}),ensure_ascii=False)]
     lines += ['', '## Provider Usage','',json.dumps(report['usage'],ensure_ascii=False), '', '## Errors','']
     lines.append(f'Total errors including unresolved: {len(errors)}.')
     for err in errors[:20]:lines.append(f"- {err['product_id']} ({err['difficulty']}): expected {err['expected']}, predicted {err['predicted'] or 'unresolved'} (candidate {err.get('candidate_category')}), confidence {err['confidence']}, source {err['source']}.")

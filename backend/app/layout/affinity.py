@@ -16,6 +16,7 @@ AFFINITY = {
 SAME_CATEGORY_BONUS = 8
 FRAGMENTATION_PENALTY = 6
 FEATURED_POSITION_BONUS = (8, 6, 6, 8, 3, 1, 1, 3, 2, 0, 0, 2)
+FEATURED_ROLE_BONUS = {'hero': 72, 'featured': 32, 'standard': 0, 'compact': 0}
 
 
 def affinity(a: str, b: str) -> int:

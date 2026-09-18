@@ -123,4 +123,11 @@ async def resolve_products(
         product = ResolvedProduct.model_validate(data)
         resolved.append(product)
         metadata[product.id] = ClassificationMetadata(category=product.category, subcategory=product.subcategory, source=source, confidence=result.confidence)
-    return ResolvedBannerRequest(campaign=request.campaign, template=request.template, products=tuple(resolved)), metadata
+    return ResolvedBannerRequest(
+        campaign=request.campaign,
+        template=request.template,
+        hero_products=request.hero_products,
+        featured_products=request.featured_products,
+        visual_direction=request.visual_direction,
+        products=tuple(resolved),
+    ), metadata

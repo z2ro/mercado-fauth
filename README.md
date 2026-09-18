@@ -10,9 +10,10 @@ JSON → Pydantic → Classificação → ResolvedProduct → Layout Planner →
 
 - `backend/app/models/`: modelos imutáveis, preços Decimal, contrato e DesignSpec.
 - `backend/app/layout/`: grid, restrições, afinidade, score e busca determinística.
+- `backend/app/design/system.py`: tokens de marca e escalas visuais compartilhados.
 - `backend/app/assets/processor.py`: leitura segura de imagens locais, orientação EXIF, redução proporcional e normalização em PNG embutido.
 - `backend/app/renderer/`: combinação do DesignSpec com dados originais e screenshot.
-- `backend/app/templates/supermarket_12/`: HTML/CSS do primeiro template.
+- `backend/app/templates/`: templates `supermarket_12`, `weekend_hero` e `price_attack`.
 - `backend/app/main.py`: API síncrona FastAPI.
 - `backend/tests/`: testes de domínio, planejamento, renderização e integração com Chromium real.
 
@@ -88,7 +89,7 @@ O exemplo completo, executável, está em [`examples/campaign.json`](examples/ca
 }
 ```
 
-O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `phone`, `instagram`) e `products`. `template` é opcional e aceita apenas `supermarket_12`.
+O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `phone`, `instagram`) e `products`. `template` é opcional e aceita `supermarket_12`, `weekend_hero` ou `price_attack`. Sem seleção explícita, produtos marcados como `featured` levam a `weekend_hero`; `visual_direction.emphasis="price"` sem destaques escolhe `price_attack`; demais campanhas mantêm o template legado.
 
 Validações (HTTP **422**): exatamente 12 produtos, IDs únicos, nomes e unidades não vazios, categoria suportada, validade no formato dia/mês/ano e data real. Preço deve ser **string decimal positiva**, com no máximo duas casas decimais e oito dígitos totais. Números JSON, inclusive floats, são rejeitados. Não há arredondamento silencioso. Limites de texto: nome 70 caracteres, unidade 12 e demais campos comerciais 120. Campos desconhecidos são rejeitados.
 
@@ -96,7 +97,7 @@ Categorias: `acougue`, `frios`, `padaria`, `hortifruti`, `mercearia`, `bebidas`,
 
 ## Layout Planner
 
-Grid fixo de 4 colunas × 3 linhas. `slot = y * 4 + x`, de 0 a 11. Vizinhança horizontal e vertical usa distância Manhattan igual a 1; diagonais não contam.
+O template legado usa grid fixo de 4 colunas × 3 linhas. `slot = y * 4 + x`, de 0 a 11. Vizinhança horizontal e vertical usa distância Manhattan igual a 1; diagonais não contam.
 
 1. Ordena produtos por categoria, destaque e ID, independentemente da ordem do JSON.
 2. Enumera as posições de limpeza: no máximo `C(12, 6) = 924` conjuntos.
@@ -126,7 +127,17 @@ Se a campanha for impossível (por exemplo, 11 itens de açougue e um de limpeza
 | Mercearia / bebidas | +2 |
 | Limpeza / açougue, hortifruti ou padaria | -10 e proibido |
 
-Pares não listados são neutros. O score soma afinidades de vizinhos, dá bônus a featured nas posições fortes (principalmente os cantos superiores) e desconta seis pontos por componente desconectado adicional de cada categoria. Featured não aumenta o card nesta fase.
+Pares não listados são neutros. No template legado, o score soma afinidades de vizinhos, dá bônus a featured nas posições fortes (principalmente os cantos superiores) e desconta seis pontos por componente desconectado adicional de cada categoria.
+
+## Layout Engine 2.0
+
+`supermarket_12` e seu DesignSpec V1 continuam compatíveis. Os novos templates usam DesignSpec V2, um grid lógico retangular com placements (`x`, `y`, `w`, `h`), role (`hero`, `featured`, `standard`, `compact`), zona e escalas limitadas. O schema aceita apenas referências geométricas e metadados de apresentação; preço, nome, SKU, unidade e imagem continuam sendo lidos do produto original pelo renderer.
+
+O planner escolhe um pattern estrutural, posiciona até um hero e até dois featured, evita que limpeza toque açougue, hortifruti ou padaria, e melhora o agrupamento com trocas locais determinísticas. Não permuta os 12 produtos exaustivamente. Placements retangulares não podem se sobrepor; adjacência considera bordas horizontais/verticais com trecho compartilhado, sem diagonais. Layouts impossíveis falham com erro em vez de relaxar uma regra.
+
+`weekend_hero` reserva a metade superior esquerda para um hero grande e organiza as outras ofertas em blocos assimétricos. `price_attack` organiza 12 cards compactos em três faixas, com imagem e preço em composição horizontal. Defaults de cores, tipografia, espaçamento, raio, sombras e escalas por role estão centralizados em `backend/app/design/system.py` e são expostos aos templates como CSS variables.
+
+Veja [`campaign-weekend-hero.json`](examples/campaign-weekend-hero.json) e [`campaign-price-attack.json`](examples/campaign-price-attack.json). Para escolher o hero, informe `template: "weekend_hero"` e `hero_products: ["p001"]`; `featured_products` aceita até dois IDs distintos. `visual_direction` recebe mood e ênfase validados, sem texto livre nem alteração de conteúdo comercial.
 
 ## Imagens e renderização
 
@@ -146,7 +157,7 @@ O teste de POST usa Chromium real e verifica um PNG real. Portanto instale Playw
 
 ## Limitações
 
-- Apenas 12 produtos, 1080 × 1080 e um template. Imagens do exemplo são placeholders explícitos.
+- Apenas 12 produtos, 1080 × 1080 e três templates determinísticos; os assets do exemplo são sintéticos/placeholders, não fotos comerciais.
 - Busca heurística melhora agrupamento, mas não garante score ótimo global.
 - Um navegador por requisição: adequado ao MVP com baixo volume; sem fila ou limite distribuído de concorrência.
 - Sem autenticação, armazenamento remoto, histórico, download por API ou limpeza automática de output. Uso inicial local/controlado.
@@ -159,13 +170,13 @@ O teste de POST usa Chromium real e verifica um PNG real. Portanto instale Playw
 
 **Classificação automática — implementada e testada offline:** regras determinísticas, cache, interface batch e provider LLM opcional com Structured Outputs. A integração externa foi validada com transporte HTTP simulado; não foi efetuada chamada paga.
 
-**Fase 2 — restante:** templates para 4, 6, 8 e 16 produtos.
+**Layout Engine 2.0 — implementado e testado:** DesignSpec V2, roles e zones, placements retangulares, hero, templates `weekend_hero` e `price_attack`, tokens de marca e hard rules de adjacência retangular.
 
-**Fase 3:** OR-Tools, layouts assimétricos, produtos destacados ocupando dois slots. A separação entre grid, placements e renderer é o ponto de extensão; o contrato atual continua fixo em 12 slots.
+**Próxima fase:** AI Art Director com validação de template/hero/featured/direção visual e Visual QA. Esta execução não usa IA para escolher layout nem gerar conteúdo.
 
-**Fase 4:** LLM como diretor de arte, seleção automática de template, geração de headline e análise visual multimodal.
+**Depois:** templates para 4, 6, 8 e 16 produtos; OR-Tools e placements com múltiplos slots; integrações externas e publicação.
 
-**Fase 5:** Google Sheets, ERP, armazenamento, histórico de campanhas, aprovação humana e publicação automática em redes sociais.
+Google Sheets, ERP, armazenamento, histórico de campanhas, aprovação humana e publicação automática em redes sociais seguem fora do MVP.
 
 
 ## Pipeline de fotos reais
@@ -308,4 +319,4 @@ Repita a chamada e observe `source: cache` e `classification_cache_hit`. A suít
 
 ## Classification Evaluation
 
-O evaluator mede categorias, dificuldade, confiança, regra conhecida, latência e repetibilidade contra ground truth. Execute `python -m eval.run_eval --provider fake --dataset eval/datasets/products.json --batch-size 12`; o provider fake serve somente para testar a infraestrutura e **não mede qualidade de IA**. Para uma avaliação real, configure `BANNER_AI_PROVIDER=openai`, `BANNER_AI_MODEL` e `BANNER_AI_API_KEY` e use `--provider openai`; chamadas externas podem gerar custo. Relatórios ficam em `eval/results/<run-id>/`. Métricas, cache isolado e limitações estão em [`eval/README.md`](eval/README.md).
+O evaluator mede categorias, dificuldade, confidence, `rule_matched` (`>= min_confidence`) e `rule_strong` (`>= 0.90`), latência de avaliação e latência/counters do provider. `real_provider_eval` retorna `NOT_RUN`, `COMPLETED` ou `ATTEMPTED_FAILED`. Execute `python -m eval.run_eval --provider fake --dataset eval/datasets/products.json --batch-size 12`; o provider fake serve somente para testar a infraestrutura e **não mede qualidade de IA**. Para uma avaliação real, configure `BANNER_AI_PROVIDER=openai`, `BANNER_AI_MODEL` e `BANNER_AI_API_KEY` e use `--provider openai`; chamadas externas podem gerar custo. Relatórios ficam em `eval/results/<run-id>/`. Métricas, cache isolado e limitações estão em [`eval/README.md`](eval/README.md).

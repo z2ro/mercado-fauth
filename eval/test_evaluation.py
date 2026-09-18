@@ -11,12 +11,12 @@ from backend.app.classification.llm import LLMProductClassifier
 from backend.app.classification.models import ProductClassificationInput
 from backend.app.config import ClassificationSettings, ROOT
 from eval.dataset import EvalProduct, load_dataset
-from eval.evaluator import chunks, evaluate_ai, evaluate_hybrid, evaluate_rule
+from eval.evaluator import chunks, evaluate_ai, evaluate_hybrid, evaluate_rule, rule_classification_flags
 from eval.fake_provider import FakeProductClassifier
 from eval.metrics import (CATEGORIES, confidence_analysis, confusion_matrix, grouped_accuracy,
                           percentile, repeatability, rule_known_analysis, score_rows, subcategory_accuracy)
 from eval.reporting import write_outputs
-from eval.run_eval import clear_eval_cache, main
+from eval.run_eval import clear_eval_cache, main, provider_status
 
 DATASET=ROOT/'eval/datasets/products.json'
 
@@ -106,6 +106,33 @@ def test_rule_known_and_difficulty(rows):
     assert difficulty['easy']['accuracy']==1 and difficulty['hard']['accuracy']==0
 
 
+def test_rule_matched_and_strong_are_distinct():
+    from backend.app.models.product import Category
+    products=(
+        EvalProduct(id='moderate',name='Iogurte natural',unit='UN',expected_category=Category.FRIOS,
+                    expected_subcategory='laticinios',difficulty='medium'),
+        EvalProduct(id='strong',name='Paleta bovina',unit='KG',expected_category=Category.ACOUGUE,
+                    expected_subcategory='carne_bovina',difficulty='easy'),
+    )
+    flags=asyncio.run(rule_classification_flags(products,.70))
+    assert flags=={'moderate':{'matched':True,'strong':False},'strong':{'matched':True,'strong':True}}
+
+
+@pytest.mark.parametrize('provider,available,modes,calls,successes,expected,reason',[
+    ('openai',False,('ai',),0,0,'NOT_RUN','credentials_missing'),
+    ('openai',True,('rule',),0,0,'NOT_RUN','provider_mode_not_requested'),
+    ('openai',True,('ai',),0,0,'NOT_RUN','no_external_provider_batches'),
+    ('openai',True,('ai',),2,0,'ATTEMPTED_FAILED',None),
+    ('openai',True,('ai','hybrid'),3,1,'COMPLETED',None),
+    ('fake',True,('ai',),3,3,'NOT_RUN','fake_provider_is_not_real'),
+])
+def test_real_provider_status(provider,available,modes,calls,successes,expected,reason):
+    state,why=provider_status(provider,available,modes,
+        {'provider_call_count':calls,'provider_success_count':successes},reason)
+    assert state==expected
+    assert why==reason
+
+
 def test_subcategory_exact_and_unresolved(rows):
     assert subcategory_accuracy(rows)==pytest.approx(1/3)
     assert subcategory_accuracy([dict(rows[0],expected_subcategory=None)]) is None
@@ -176,6 +203,14 @@ def test_eval_cache_hit_isolated_from_production_cache(tmp_path):
     assert all(row['source']=='ai' for row in first['rows'])
     assert all(row['source']=='cache' for row in second['rows'])
     assert len(list((tmp_path/'eval-classifications').glob('*.json')))==len(sample)
+    assert first['latency']['evaluation_batch_count']==2
+    assert first['latency']['provider_call_count']==2
+    assert first['latency']['provider_success_count']==2
+    assert first['latency']['provider_failure_count']==0
+    assert first['latency']['provider_latency_p50'] is not None
+    assert second['latency']['evaluation_batch_count']==2
+    assert second['latency']['provider_call_count']==0
+    assert second['latency']['provider_latency_p95'] is None
 
 
 def test_openai_usage_collection_uses_production_classifier_offline():
@@ -202,6 +237,11 @@ def test_provider_failure_is_recorded(tmp_path,monkeypatch):
     monkeypatch.setattr(evaluator,'LLMProductClassifier',lambda settings:Failure())
     result=asyncio.run(evaluator.evaluate_ai(dataset[:4],{p.id:False for p in dataset[:4]},4,1,settings,'openai',False))
     assert result['unresolved_products']==4 and result['usage'] is None
+    assert result['latency']['evaluation_batch_count']==1
+    assert result['latency']['provider_call_count']==1
+    assert result['latency']['provider_success_count']==0
+    assert result['latency']['provider_failure_count']==1
+    assert result['latency']['provider_average_latency'] is not None
 
 
 def test_report_files_consistent(tmp_path,rows):

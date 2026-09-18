@@ -11,8 +11,9 @@ from pathlib import Path
 from backend.app.config import ROOT, classification_settings
 
 from .dataset import load_dataset
-from .evaluator import (assemble_report,evaluate_ai,evaluate_hybrid,evaluate_rule,
-                        public_mode,rule_known_flags)
+from .evaluator import (aggregate_provider_metrics, assemble_report, evaluate_ai,
+                        evaluate_hybrid, evaluate_rule, public_mode,
+                        rule_classification_flags)
 from .reporting import write_outputs
 
 EVAL_CACHE_DIR=ROOT/'.cache'/'eval-classifications'
@@ -64,6 +65,20 @@ def result_directory(provider):
     return path
 
 
+def provider_status(provider, available, requested_modes, counts, unavailable_reason=None):
+    if provider != 'openai':
+        return 'NOT_RUN', 'fake_provider_is_not_real'
+    if not available:
+        return 'NOT_RUN', unavailable_reason or 'provider_unavailable'
+    if not {'ai', 'hybrid'} & set(requested_modes):
+        return 'NOT_RUN', 'provider_mode_not_requested'
+    if counts['provider_call_count'] == 0:
+        return 'NOT_RUN', 'no_external_provider_batches'
+    if counts['provider_success_count']:
+        return 'COMPLETED', None
+    return 'ATTEMPTED_FAILED', None
+
+
 def main(argv=None):
     args=parser().parse_args(argv)
     if args.input_cost_per_million is not None and args.output_cost_per_million is None or args.output_cost_per_million is not None and args.input_cost_per_million is None:
@@ -77,10 +92,20 @@ def main(argv=None):
     else:
         settings=settings.model_copy(update={'enabled':True,'provider':'openai','cache_dir':EVAL_CACHE_DIR/'openai'})
     effective_cache=not args.no_cache and args.runs==1
-    flags=asyncio.run(rule_known_flags(dataset,settings.min_confidence))
-    if args.provider=='openai' and (not settings.api_key.get_secret_value() or not settings.model or settings.provider not in ('','openai')):
-        provider_available=False
-    else:provider_available=True
+    flags=asyncio.run(rule_classification_flags(dataset,settings.min_confidence))
+    if args.provider == 'openai':
+        configured_provider = settings.provider in ('', 'openai')
+        credentials_present = bool(settings.api_key.get_secret_value() and settings.model)
+        provider_available = configured_provider and credentials_present
+        if not credentials_present:
+            skip_reason = 'credentials_missing'
+        elif not configured_provider:
+            skip_reason = 'provider_configuration_mismatch'
+        else:
+            skip_reason = None
+    else:
+        provider_available = True
+        skip_reason = 'fake_provider_is_not_real'
     if args.provider=='openai':settings=settings.model_copy(update={'provider':'openai'})
     requested=('rule','ai','hybrid') if args.mode=='all' else (args.mode,)
     mode_results={}
@@ -94,24 +119,30 @@ def main(argv=None):
     if 'hybrid' in requested:
         hybrid_settings=settings.model_copy(update={'enabled':provider_available,'provider':'openai' if args.provider=='openai' else 'fake','cache_dir':settings.cache_dir/'hybrid'})
         mode_results['hybrid']=asyncio.run(evaluate_hybrid(dataset,flags,args.batch_size,args.runs,hybrid_settings,args.provider,effective_cache))
-    real_status='RUN' if args.provider=='openai' and provider_available and any(n in mode_results for n in ('ai','hybrid')) else 'NOT_RUN'
+    provider_counts = aggregate_provider_metrics(mode_results)
+    real_status, skip_reason = provider_status(args.provider, provider_available, requested,
+                                               provider_counts, skip_reason)
     configuration={'provider':args.provider,'model':settings.model or ('fixed-baseline (not a real model)' if args.provider=='fake' else None),
         'batch_size':args.batch_size,'runs':args.runs,'mode':args.mode,'min_confidence':settings.min_confidence,
         'cache_enabled':effective_cache,'dataset':str(args.dataset.resolve()),
-        'fake_is_not_quality_eval':args.provider=='fake'}
+        'fake_is_not_quality_eval':args.provider=='fake','provider_available':provider_available}
     costs=(args.input_cost_per_million,args.output_cost_per_million) if args.input_cost_per_million is not None else None
-    report=assemble_report(dataset,digest,flags,configuration,mode_results,real_status,costs)
+    report=assemble_report(dataset,digest,flags,configuration,mode_results,real_status,costs,skip_reason)
     primary=next((mode_results[n] for n in ('hybrid','ai','rule') if mode_results.get(n)),None)
     # Error records summarize the primary mode; predictions retain each requested mode and run.
     if primary:
         errors=[{'run':r['run'],'mode':next(n for n in ('hybrid','ai','rule') if mode_results.get(n) is primary),
                  'product_id':r['product_id'],'name':r['name'],'difficulty':r['difficulty'],'rule_known':r['rule_known'],
+                 'rule_matched':r['rule_matched'],'rule_strong':r['rule_strong'],
                  'expected':r['expected_category'],'predicted':r['predicted_category'],'candidate_category':r['candidate_category'],'confidence':r['confidence'],
                  'source':r['source'],'unresolved':not r['resolved']} for r in primary['rows'] if not r['correct']]
     output=result_directory(args.provider)
     write_outputs(output,report,errors,{name:result['rows'] for name,result in mode_results.items() if result})
     print(json.dumps({'result_dir':str(output),'provider':args.provider,'fake_is_not_quality_eval':args.provider=='fake',
-        'real_provider_eval':real_status,'total_products':len(dataset),'rule_known':sum(flags.values()),'rule_unknown':len(flags)-sum(flags.values()),
+        'real_provider_eval':real_status,'provider_skip_reason':skip_reason,
+        'provider_metrics':provider_counts,'total_products':len(dataset),
+        'rule_matched':sum(value['matched'] for value in flags.values()),
+        'rule_strong':sum(value['strong'] for value in flags.values()),
         'modes':{n:public_mode(v) for n,v in mode_results.items()}},ensure_ascii=False,indent=2))
     return 0
 

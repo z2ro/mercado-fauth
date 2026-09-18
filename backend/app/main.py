@@ -10,7 +10,7 @@ from .classification.models import ClassificationMetadata
 from .classification.resolver import UnresolvedClassification, resolve_products
 from .layout.planner import ImpossibleLayout, plan_layout
 from .models.campaign import BannerRequest
-from .models.design import DesignSpec
+from .models.design import DesignSpec, DesignSpecV2
 from .renderer.renderer import render_html
 from .renderer.screenshot import screenshot
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class BannerResponse(BaseModel):
     status: str = 'created'
     file: str
-    design: DesignSpec
+    design: DesignSpec | DesignSpecV2
     classification: dict[str, ClassificationMetadata] | None = None
 
 

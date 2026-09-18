@@ -1,4 +1,5 @@
 {
+  "template": "supermarket_12",
   "campaign": {
     "title": "Ofertas da Semana",
     "valid_until": "20/09/2026",

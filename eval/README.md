@@ -6,7 +6,7 @@ Avaliador offline/reprodutível de `RuleBasedProductClassifier`, do provider de 
 
 `datasets/products.json` contém 120 registros balanceados: 15 por cada categoria e 40 por nível (`easy`, `medium`, `hard`). Há nomes simples, compostos, marcas e itens cuja classificação exige generalização além das palavras das regras. Cada categoria e nível têm ground truth escrito manualmente; `expected_subcategory` também é curado e validado em snake_case. IDs, campos não vazios, categorias, subcategorias e dificuldades são validados antes da execução. O hash SHA-256 do JSON bruto identifica a versão no relatório. Uma alteração de exemplos muda o hash; comparar métricas entre versões requer observar esse hash.
 
-`rule_known` é calculado em execução pelo classificador de regras de produção com `confidence >= BANNER_CLASSIFICATION_MIN_CONFIDENCE`; não existe anotação manual. Isso significa que o split acompanha a configuração de confidence.
+`rule_matched` é calculado em execução pelo classificador real com `confidence >= BANNER_CLASSIFICATION_MIN_CONFIDENCE`. `rule_strong` marca regras com confidence `>= STRONG_CONFIDENCE` (0,90), independentemente do threshold configurado. `rule_known` permanece como alias compatível de `rule_matched`; nenhum desses campos é anotado manualmente.
 
 ## Execução
 
@@ -26,7 +26,7 @@ BANNER_AI_API_KEY="$BANNER_AI_API_KEY" \
 python -m eval.run_eval --provider openai --batch-size 12
 ```
 
-`BANNER_AI_API_KEY` vem do ambiente e nunca aparece em resultados ou logs. O provider real usa exatamente o `LLMProductClassifier`, endpoint, prompt, JSON Schema e `ProductClassification` de produção. O HTTP payload de classificação só leva `product_id`, `name`, `unit`. Se provider/modelo/chave não estiverem configurados, a parte AI fica `null`/`NOT_RUN`; regras, dataset e modos offline ainda podem ser avaliados. Requests reais podem gerar custo. Os preços não são presumidos: custo só é calculado com uso real de tokens e as duas opções `--input-cost-per-million` e `--output-cost-per-million`.
+`BANNER_AI_API_KEY` vem do ambiente e nunca aparece em resultados ou logs. O provider real usa exatamente o `LLMProductClassifier`, endpoint, prompt, JSON Schema e `ProductClassification` de produção. O HTTP payload de classificação só leva `product_id`, `name`, `unit`. Se provider/modelo/chave não estiverem configurados, a parte AI fica `null`/`NOT_RUN`; regras, dataset e modos offline ainda podem ser avaliados. `real_provider_eval` diferencia `NOT_RUN` (sem tentativa, incluindo credenciais ausentes), `COMPLETED` (pelo menos uma chamada batch concluída) e `ATTEMPTED_FAILED` (houve chamada, todas falharam). Os contadores por chamada são `provider_call_count`, `provider_success_count` e `provider_failure_count`. Requests reais podem gerar custo. Os preços não são presumidos: custo só é calculado com uso real de tokens e as duas opções `--input-cost-per-million` e `--output-cost-per-million`.
 
 Opções: `--provider fake|openai`; `--dataset PATH`; `--batch-size 1|4|8|12|24`; `--runs N`; `--mode all|rule|ai|hybrid`; `--no-cache`; `--clear-cache`; preços opcionais por milhão de tokens. Default: fake, todos os modos, batch 12, uma run. O último batch pode ser menor. Execuções recebem diretório novo, sem sobrescrever relatórios prévios.
 
@@ -44,7 +44,7 @@ Accuracy usa todo produto no denominador; produtos sem categoria são erros `unr
 
 Threshold tables mostram accepted/rejected/coverage/accuracy dos candidatos por thresholds fixos de 0,50 a 0,95. Não modificam a classificação usada para o banner nem recomendam um threshold. Confidence bins arredondam a faixa ao centésimo informado (`0,00–0,49`, etc.). AI rule-known e unknown são medidos à parte, com especial interesse em rule-unknown.
 
-Latência é wall clock de cada lote e total do modo, incluindo overhead local. `p50` e `p95` usam interpolação linear. `batch_count` conta batches avaliados pelo modo; lote só servido pelo cache não conta como chamada externa AI. Tokens só aparecem se o endpoint devolver usage válido. Custo é `null` quando tokens ou ambos os preços não estão disponíveis; nunca estimado a partir de suposições.
+Latência é wall clock total do modo e por batch avaliado, incluindo overhead local. `evaluation_batch_count`/`evaluation_batch_latencies` contam processamento do evaluator, inclusive regra/cache; `provider_call_count` e `provider_latency_p50`, `provider_latency_p95`, `provider_average_latency` medem exclusivamente invocações reais do classificador externo/fake. Um lote resolvido por regra ou cache não conta como chamada de provider. `p50` e `p95` usam interpolação linear. Tokens só aparecem se o endpoint devolver usage válido. Custo é `null` quando tokens ou ambos os preços não estão disponíveis; nunca estimado a partir de suposições.
 
 ## Runs, cache e repetibilidade
 
@@ -68,4 +68,4 @@ O JSON é a fonte de métricas. As previsões em CSV preservam os candidatos de 
 
 ## Limitações
 
-Ground truth foi escrito manualmente e representa esta amostra, não todos os SKUs/lojas/idiomas. Dificuldade também é rótulo humano. Rule-known mede cobertura/confiança das regras atuais. Confiança produzida por LLM pode não estar calibrada; bins e coverage medem comportamento da amostra, não garantia estatística. Datasets pequenos ou mudanças de dataset não devem ser comparados sem hash. Fake nunca deve ser usado para alegar precisão. Avaliação real requer configuração/modelo válidos e pode ter custo; a integração testada por HTTP mock confirma protocolo/schema, não acurácia do provider.
+Ground truth foi escrito manualmente e representa esta amostra, não todos os SKUs/lojas/idiomas. Dificuldade também é rótulo humano. `rule_matched` mede cobertura sob o threshold atual; `rule_strong` mede regras de alta confiança. Confiança produzida por LLM pode não estar calibrada; bins e coverage medem comportamento da amostra, não garantia estatística. Datasets pequenos ou mudanças de dataset não devem ser comparados sem hash. Fake nunca deve ser usado para alegar precisão. Avaliação real requer configuração/modelo válidos e pode ter custo; a integração testada por HTTP mock confirma protocolo/schema, não acurácia do provider.
