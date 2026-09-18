@@ -7,3 +7,5 @@ output/*
 
 *:Zone.Identifier
 .cache/
+eval/results/*
+!eval/results/.gitkeep

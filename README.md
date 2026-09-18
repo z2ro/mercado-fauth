@@ -304,3 +304,8 @@ curl --fail-with-body -sS -X POST http://localhost:8000/api/v1/banners \
 ```
 
 Repita a chamada e observe `source: cache` e `classification_cache_hit`. A suíte usa `FakeProductClassifier`, `httpx.MockTransport` e caches temporários; não chama o provider real. Há testes de batch, timeout, falhas, threshold, preservação dos campos comerciais, integração com hard rules e screenshot Chromium 1080×1080.
+
+
+## Classification Evaluation
+
+O evaluator mede categorias, dificuldade, confiança, regra conhecida, latência e repetibilidade contra ground truth. Execute `python -m eval.run_eval --provider fake --dataset eval/datasets/products.json --batch-size 12`; o provider fake serve somente para testar a infraestrutura e **não mede qualidade de IA**. Para uma avaliação real, configure `BANNER_AI_PROVIDER=openai`, `BANNER_AI_MODEL` e `BANNER_AI_API_KEY` e use `--provider openai`; chamadas externas podem gerar custo. Relatórios ficam em `eval/results/<run-id>/`. Métricas, cache isolado e limitações estão em [`eval/README.md`](eval/README.md).

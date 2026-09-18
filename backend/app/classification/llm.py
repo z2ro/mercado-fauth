@@ -18,6 +18,7 @@ class LLMProductClassifier:
     def __init__(self, settings: ClassificationSettings, transport: httpx.AsyncBaseTransport | None = None):
         self.settings = settings
         self.transport = transport
+        self.last_usage: dict[str, int] | None = None
 
     async def classify(self, product: ProductClassificationInput) -> ProductClassification:
         return (await self.classify_batch((product,))).for_inputs((product,))[product.product_id]
@@ -39,6 +40,13 @@ class LLMProductClassifier:
             })
             response.raise_for_status()
             envelope = response.json()
+        usage = envelope.get('usage')
+        if isinstance(usage, dict) and all(type(usage.get(key)) is int and usage[key] >= 0 for key in ('input_tokens', 'output_tokens')):
+            total = usage.get('total_tokens', usage['input_tokens'] + usage['output_tokens'])
+            self.last_usage = {'input_tokens': usage['input_tokens'], 'output_tokens': usage['output_tokens'],
+                               'total_tokens': total if type(total) is int and total >= 0 else usage['input_tokens'] + usage['output_tokens']}
+        else:
+            self.last_usage = None
         if envelope.get('status') != 'completed':
             raise ValueError('Resposta incompleta.')
         contents = [part for item in envelope.get('output', []) if item.get('type') == 'message' for part in item.get('content', [])]

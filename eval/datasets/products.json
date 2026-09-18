@@ -1,0 +1,962 @@
+[
+  {
+    "id": "eval-001",
+    "name": "Paleta bovina",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-002",
+    "name": "Fraldinha maturada Friboi",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-003",
+    "name": "Bife ancho resfriado",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-004",
+    "name": "Picanha bovina",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-005",
+    "name": "Coxão mole em bifes",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-006",
+    "name": "Miolo de alcatra grill",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-007",
+    "name": "Frango inteiro resfriado",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-008",
+    "name": "Filé de peito congelado",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-009",
+    "name": "Sobrecoxa desossada IQF",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-010",
+    "name": "Presunto cozido",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-011",
+    "name": "Peito de peru defumado",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-012",
+    "name": "Blanquet de peru light",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-013",
+    "name": "Queijo muçarela",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-014",
+    "name": "Creme de ricota light",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-015",
+    "name": "Queijo coalho para grelha",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-016",
+    "name": "Mortadela defumada",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-017",
+    "name": "Salame tipo italiano fatiado",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-018",
+    "name": "Copa suína curada",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-019",
+    "name": "Pão francês",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-020",
+    "name": "Rosquinha de coco",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-021",
+    "name": "Mini pão de leite",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-022",
+    "name": "Bolo de chocolate",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-023",
+    "name": "Pão australiano fatiado",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-024",
+    "name": "Bisnaguinha integral",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-025",
+    "name": "Croissant amanteigado",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-026",
+    "name": "Pão de queijo congelado",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-027",
+    "name": "Focaccia de alecrim",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-028",
+    "name": "Banana prata",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-029",
+    "name": "Mix de folhas selecionadas",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-030",
+    "name": "Cogumelo paris fresco",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-031",
+    "name": "Tomate italiano",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-032",
+    "name": "Abóbora cabotiá em cubos",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-033",
+    "name": "Palmito pupunha fresco",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-034",
+    "name": "Maçã gala",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-035",
+    "name": "Mandioquinha salsa",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-036",
+    "name": "Broto de alfafa orgânico",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "frutas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-037",
+    "name": "Arroz tipo 1",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-038",
+    "name": "Molho pesto",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-039",
+    "name": "Grão-de-bico cozido pouch",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-040",
+    "name": "Feijão carioca",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-041",
+    "name": "Cereal matinal sem açúcar",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-042",
+    "name": "Batata palha extra fina",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-043",
+    "name": "Macarrão espaguete",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-044",
+    "name": "Farinha de trigo especial",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-045",
+    "name": "Tahine integral gergelim",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-046",
+    "name": "Coca-Cola lata",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-047",
+    "name": "Néctar de uva 1L",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-048",
+    "name": "Bebida isotônica sabor limão",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-049",
+    "name": "Suco de laranja integral",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-050",
+    "name": "Água tônica zero açúcar",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-051",
+    "name": "Kombucha gengibre orgânica",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-052",
+    "name": "Cerveja pilsen lata",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-053",
+    "name": "Chá mate gaseificado",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-054",
+    "name": "Espumante brut nacional",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-055",
+    "name": "Detergente neutro",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-056",
+    "name": "Lava roupas líquido concentrado",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-057",
+    "name": "Tira manchas oxigenado em pó",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-058",
+    "name": "Água sanitária",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-059",
+    "name": "Esponja multiuso dupla face",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-060",
+    "name": "Refil mop absorvente",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-061",
+    "name": "Desinfetante floral",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-062",
+    "name": "Limpador perfumado lavanda",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-063",
+    "name": "Limpador enzimático para pisos",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-064",
+    "name": "Shampoo anticaspa",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-065",
+    "name": "Escova dental macia",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-066",
+    "name": "Protetor solar facial FPS 60",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-067",
+    "name": "Sabonete glicerinado",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-068",
+    "name": "Fio dental encerado",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-069",
+    "name": "Enxaguante bucal sem álcool",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-070",
+    "name": "Creme dental menta",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-071",
+    "name": "Desodorante aerosol sem perfume",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-072",
+    "name": "Sérum capilar reparador",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-073",
+    "name": "Picanha fatiada bovina",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-074",
+    "name": "Carne bovina para panela",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-075",
+    "name": "Maminha temperada resfriada",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-076",
+    "name": "Cupim bovino peça",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-077",
+    "name": "Flat iron steak Angus",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-078",
+    "name": "Denver steak maturado",
+    "unit": "UN",
+    "expected_category": "acougue",
+    "expected_subcategory": "carne_bovina",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-079",
+    "name": "Queijo prato lanche",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-080",
+    "name": "Peito de peru fatiado",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-081",
+    "name": "Minas padrão meia cura",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-082",
+    "name": "Pastrami bovino artesanal",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-083",
+    "name": "Stracciatella di burrata",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-084",
+    "name": "Lombo canadense condimentado",
+    "unit": "UN",
+    "expected_category": "frios",
+    "expected_subcategory": "embutidos",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-085",
+    "name": "Pão de forma tradicional",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-086",
+    "name": "Bolo de fubá cremoso",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-087",
+    "name": "Ciabatta italiana rústica",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-088",
+    "name": "Palmier folhado açúcar",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-089",
+    "name": "Pain au chocolat congelado",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-090",
+    "name": "Grissini integral alecrim",
+    "unit": "UN",
+    "expected_category": "padaria",
+    "expected_subcategory": "paes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-091",
+    "name": "Cenoura selecionada",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "legumes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-092",
+    "name": "Manga palmer",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "legumes",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-093",
+    "name": "Alho-poró nacional fresco",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "legumes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-094",
+    "name": "Inhame japonês",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "legumes",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-095",
+    "name": "Radicchio roxo italiano",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "legumes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-096",
+    "name": "Physalis bandeja pequena",
+    "unit": "UN",
+    "expected_category": "hortifruti",
+    "expected_subcategory": "legumes",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-097",
+    "name": "Milho verde lata",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-098",
+    "name": "Café torrado moído",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-099",
+    "name": "Shoyu tradicional 500ml",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-100",
+    "name": "Panko farinha japonesa",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-101",
+    "name": "Arroz arbóreo carnaroli",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-102",
+    "name": "Missô branco fermentado",
+    "unit": "UN",
+    "expected_category": "mercearia",
+    "expected_subcategory": "mercearia_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-103",
+    "name": "Água de coco integral",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-104",
+    "name": "Vinho tinto suave",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-105",
+    "name": "Cold brew café lata",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-106",
+    "name": "Tepache fermentado abacaxi",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-107",
+    "name": "Vinho verde Loureiro DOC",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-108",
+    "name": "Kefir de água frutas vermelhas",
+    "unit": "UN",
+    "expected_category": "bebidas",
+    "expected_subcategory": "bebidas_diversas",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-109",
+    "name": "Lustra móveis lavanda",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-110",
+    "name": "Desengordurante cozinha",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-111",
+    "name": "Limpa vidros sem amônia",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-112",
+    "name": "Peróxido tira manchas tecido",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-113",
+    "name": "Limpador alcalino enzimático",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-114",
+    "name": "Impermeabilizante para estofados",
+    "unit": "UN",
+    "expected_category": "limpeza",
+    "expected_subcategory": "limpeza_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-115",
+    "name": "Máscara capilar hidratação",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-116",
+    "name": "Hastes flexíveis algodão",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval-117",
+    "name": "Água micelar pele sensível",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-118",
+    "name": "Creme para pentear cachos",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval-119",
+    "name": "Óleo de limpeza facial cleansing oil",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval-120",
+    "name": "Esfoliante químico AHA corporal",
+    "unit": "UN",
+    "expected_category": "higiene",
+    "expected_subcategory": "higiene_geral",
+    "difficulty": "hard"
+  }
+]
