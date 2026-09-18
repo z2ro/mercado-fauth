@@ -3,7 +3,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from ..assets.processor import product_image
+from ..assets.processor import prepare_asset
 from ..config import ASSET_DIR, TEMPLATE_DIR
 from ..layout.rules import hard_rules_valid
 from ..models.campaign import BannerRequest
@@ -33,7 +33,7 @@ def render_html(request: BannerRequest, design: DesignSpec, asset_dir: Path = AS
     for placement, product in zip(placements, ordered):
         if placement.featured != product.featured:
             raise ValueError('DesignSpec alterou destaque do produto.')
-        cards.append({'product': product, 'placement': placement, 'price': format_price(product.price), 'image': product_image(product.image, asset_dir)})
+        cards.append({'product': product, 'placement': placement, 'price': format_price(product.price), 'image': prepare_asset(product.image, asset_dir)})
     return ENV.get_template(f'{design.template}/template.html').render(
         campaign=request.campaign, cards=cards,
         css=(TEMPLATE_DIR / design.template / 'style.css').read_text(),

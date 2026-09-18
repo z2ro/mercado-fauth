@@ -11,6 +11,8 @@ from .models.design import DesignSpec
 from .renderer.renderer import render_html
 from .renderer.screenshot import screenshot
 
+logging.basicConfig(level=logging.INFO, format='%(levelname)s %(name)s %(message)s')
+
 app = FastAPI(title='promo-banner-ai', version='0.1.0')
 logger = logging.getLogger(__name__)
 

@@ -1,33 +1,37 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 1080px; height: 1080px; }
 body { font-family: Arial, sans-serif; color: #102e30; }
-.banner { width: 1080px; height: 1080px; padding: 24px; background: radial-gradient(ellipse at top left, #ffed87, transparent 60%), #ffd326; display: grid; grid-template-rows: 112px 44px 728px 112px; gap: 12px; }
+.banner { width: 1080px; height: 1080px; padding: 24px; background: radial-gradient(ellipse at top left, #ffed87, transparent 60%), #ffd326; display: grid; grid-template-rows: 100px 42px 752px 102px; gap: 12px; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .headline { width: 700px; }
 .eyebrow { font-size: 15px; font-weight: 800; letter-spacing: 3px; }
-h1 { font-size: 54px; line-height: 1.05; letter-spacing: -2px; text-transform: uppercase; margin: 8px 0 0; height: 62px; overflow-wrap: anywhere; }
-.brand { width: 290px; padding: 12px 20px; border-left: 3px solid #102e30; }
+h1 { font-size: 56px; line-height: 1.05; letter-spacing: -2px; text-transform: uppercase; margin: 8px 0 0; height: 62px; overflow-wrap: anywhere; font-weight: 900; }
+.brand { width: 290px; padding: 12px 20px; border-left: 3px solid #102e30; border-left-width: 2px; }
 .brand > span { display: block; font-size: 12px; letter-spacing: 2px; margin-bottom: 8px; }
 .brand strong { display: block; font-size: 26px; height: 62px; overflow-wrap: anywhere; }
-.validity { background: #b82222; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 19px; border-radius: 5px; }
+.validity { background: #b82222; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 19px; border-radius: 22px; font-weight: 700; }
 .validity span { font-size: 12px; margin-left: 20px; }
-.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.card { background: #fffdf0; border-radius: 10px; overflow: hidden; display: grid; grid-template-rows: 126px 1fr; box-shadow: 0 3px 0 #c89e0a; }
-.product-image { padding: 8px; position: relative; display: flex; justify-content: center; align-items: center; }
-.product-image img { width: 100%; height: 100%; object-fit: contain; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.card { background: #fffdf0; border-radius: 14px; overflow: hidden; display: grid; grid-template-rows: 140px 1fr; box-shadow: 0 3px 5px #77580025; isolation: isolate; }
+.product-image { padding: 3px 8px 0; position: relative; display: flex; justify-content: center; align-items: center; background: radial-gradient(ellipse at center, #fff, #fff9e4); min-height: 0; }
+.product-image img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 3px 2px #16352b18); }
 .placeholder { color: #6a716c; font-size: 11px; letter-spacing: 1px; text-align: center; }
 .placeholder span { display: block; font-size: 43px; margin-bottom: 8px; }
 .badge { position: absolute; z-index: 1; top: 7px; left: 7px; color: white; background: #b82222; padding: 4px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-.details { background: #0d4437; color: white; padding: 8px 12px; }
-h2 { margin: 0; height: 32px; font-size: 15px; line-height: 1.05; text-transform: uppercase; overflow-wrap: anywhere; }
-.price { height: 62px; display: flex; align-items: baseline; white-space: nowrap; font-weight: 900; color: #ffe66b; font-size: 56px; letter-spacing: -2px; }
-.currency { color: white; font-size: .29em; letter-spacing: 0; margin-right: 4px; }
+.details { background: #0d4437; color: white; padding: 6px 12px 4px; border-radius: 12px 12px 0 0; }
+h2 { margin: 0; height: 32px; font-size: 15px; line-height: 1.06; text-transform: uppercase; overflow-wrap: anywhere; }
+.price { height: 60px; display: flex; align-items: baseline; white-space: nowrap; font-weight: 900; color: #ffe66b; font-size: 61px; letter-spacing: -2px; }
+.currency { color: white; font-size: .25em; letter-spacing: 0; margin-right: 4px; }
 .integer { font-size: 1em; line-height: 1; }
-.decimal { font-size: .48em; }
-.unit { margin-left: auto; padding-left: 5px; color: white; font-size: .22em; letter-spacing: 0; }
-footer { display: grid; grid-template-rows: 68px 36px; gap: 8px; }
+.decimal { font-size: .46em; letter-spacing: -1px; }
+.unit { margin-left: auto; padding-left: 5px; color: white; font-size: .20em; letter-spacing: 0; }
+footer { display: grid; grid-template-rows: 58px 36px; gap: 8px; }
 .footer-top { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-.footer-top > strong { font-size: 34px; max-width: 610px; height: 48px; overflow-wrap: anywhere; }
+.footer-top > strong { font-size: 34px; max-width: 610px; height: 48px; overflow-wrap: anywhere; font-weight: 900; }
 .footer-top > div { width: 365px; text-align: right; font-size: 18px; font-weight: 700; }
 .footer-top span { display: block; height: 25px; overflow-wrap: anywhere; }
-.address { border-radius: 5px; background: #102e30; color: white; text-align: center; padding: 7px 12px; font-size: 18px; height: 36px; overflow-wrap: anywhere; }
+.address { border-radius: 18px; background: #102e30; color: white; text-align: center; padding: 7px 12px; font-size: 18px; height: 36px; overflow-wrap: anywhere; }
+.product-image .asset-vertical { max-width: 70%; max-height: 100%; }
+.product-image .asset-horizontal { max-width: 100%; max-height: 91%; }
+.product-image .asset-square { max-width: 90%; max-height: 96%; }
+.featured .badge { background: #b82222; border-radius: 12px; padding: 5px 9px; }

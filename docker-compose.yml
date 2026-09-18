@@ -3,12 +3,20 @@ services:
     build: .
     ports:
       - "8000:8000"
+    environment:
+      BANNER_REMOVE_BACKGROUND: ${BANNER_REMOVE_BACKGROUND:-false}
+      BANNER_ASSET_CACHE_DIR: /app/.cache/assets
+      BANNER_ASSET_PADDING_RATIO: ${BANNER_ASSET_PADDING_RATIO:-0.04}
     volumes:
       - ./assets:/app/assets:ro
       - ./output:/app/output
+      - asset-cache:/app/.cache/assets
     shm_size: 256mb
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
       timeout: 3s
       retries: 5
+
+volumes:
+  asset-cache:

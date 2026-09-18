@@ -14,3 +14,10 @@ def payload():
 @pytest.fixture
 def request_model(payload):
     return BannerRequest.model_validate(payload)
+
+
+@pytest.fixture(autouse=True)
+def isolated_asset_cache(tmp_path, monkeypatch):
+    from backend.app.assets import processor
+    from backend.app.config import AssetSettings
+    monkeypatch.setattr(processor, 'ASSET_SETTINGS', AssetSettings(cache_dir=tmp_path / 'cache'))

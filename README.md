@@ -1,6 +1,6 @@
 # promo-banner-ai
 
-MVP determinístico para transformar campanhas de supermercado em banners PNG de **1080 × 1080**. Sem IA, banco ou filas. O template é inspirado na estrutura de `referencia.jpeg`, com identidade própria: amarelo promocional, faixa de validade, cards claros, preços em verde e rodapé da loja.
+MVP determinístico para transformar campanhas de supermercado em banners PNG de **1080 × 1080**. Sem IA generativa, banco ou filas. Remoção de fundo local opcional. O template é inspirado na estrutura de `referencia.jpeg`, com identidade própria: amarelo promocional, faixa de validade, cards claros, preços em verde e rodapé da loja.
 
 ## Arquitetura
 
@@ -130,7 +130,7 @@ Pares não listados são neutros. O score soma afinidades de vizinhos, dá bônu
 
 ## Imagens e renderização
 
-Substitua os placeholders por fotos reais dentro de `assets/`. Não há download nem geração por IA. Caminhos que escapem da raiz de assets, incluindo symlinks, são recusados. Arquivos ausentes, inválidos, maiores que 10 MB ou 20 megapixels geram warning e placeholder identificável, sem interromper o banner. SVG não é aceito como asset de produto; use PNG, JPEG ou outro formato raster suportado por Pillow.
+Substitua os placeholders por fotos reais dentro de `assets/`. Não há download de fotos nem geração por IA. Caminhos que escapem da raiz de assets, incluindo symlinks, são recusados. Arquivos ausentes, inválidos, maiores que 10 MB ou 20 megapixels geram warning e placeholder identificável, sem interromper o banner. SVG não é aceito como asset de produto; use PNG, JPEG ou outro formato raster suportado por Pillow.
 
 Imagens têm `object-fit: contain`. Dados são escapados por Jinja2. Chromium não acessa recursos de rede: os assets e o CSS são embutidos. Preços usam elementos separados para moeda, inteiro, centavos e unidade. Textos longos têm ajuste de fonte para preservar o conteúdo. A captura espera fontes e imagens, usa viewport 1080 × 1080 e escala 1, sem `full_page`. Pillow confere as dimensões antes de publicar o PNG por renomeação atômica.
 
@@ -153,12 +153,84 @@ O teste de POST usa Chromium real e verifica um PNG real. Portanto instale Playw
 - Limites de texto e preço protegem a área visual; conteúdos excepcionalmente longos ficam em fonte menor.
 - Reprodutibilidade visual pressupõe os mesmos assets, fontes e versão do Chromium; use Docker para ambiente consistente.
 
-## Roadmap — não implementado
+## Roadmap
 
-**Fase 2:** classificação automática por IA, remoção automática de fundo, templates para 4, 6, 8 e 16 produtos.
+**Real assets + visual quality — implementado e testado:** preparação de imagens reais, remoção local opcional, crop, padding, cache por conteúdo, composição por aspect ratio e exemplos sintéticos.
+
+**Fase 2 — restante:** classificação automática por IA e templates para 4, 6, 8 e 16 produtos.
 
 **Fase 3:** OR-Tools, layouts assimétricos, produtos destacados ocupando dois slots. A separação entre grid, placements e renderer é o ponto de extensão; o contrato atual continua fixo em 12 slots.
 
 **Fase 4:** LLM como diretor de arte, seleção automática de template, geração de headline e análise visual multimodal.
 
 **Fase 5:** Google Sheets, ERP, armazenamento, histórico de campanhas, aprovação humana e publicação automática em redes sociais.
+
+
+## Pipeline de fotos reais
+
+`original → validação → EXIF → RGBA → remoção opcional → crop alpha → padding → resize proporcional → PNG → renderer`
+
+Coloque a foto em `assets/products/` e use, por exemplo, `"image": "assets/products/arroz.jpg"`. São aceitos caminhos relativos à raiz de assets, com ou sem o prefixo `assets/`. URLs, caminhos absolutos e symlinks que escapem da raiz são rejeitados. Os limites continuam 10 MB e 20 megapixels. Formatos raster suportados por Pillow incluem PNG, JPEG, WebP, TIFF e BMP; em arquivos animados ou multipágina somente o primeiro frame é usado. SVG e conteúdo executável não são aceitos.
+
+O crop usa apenas o canal alpha, sem tentar adivinhar o fundo. RGB opaco mantém o conteúdo inteiro quando a remoção está desligada. Após o crop, cada eixo recebe padding proporcional, com arredondamento para cima. O PNG RGBA tem lado máximo de 600 px, canvas ajustado ao conteúdo e proporção preservada; não há upscale no processamento nem ampliação além do tamanho natural no CSS. Assets completamente transparentes são tratados como inválidos e exibem placeholder.
+
+Cards usam uma heurística genérica da imagem normalizada: proporção menor que 0,7 é vertical; maior que 1,5 é horizontal; demais usam a composição intermediária. A imagem permanece dentro do card e acima dos textos. Nenhuma regra depende de categoria, marca ou SKU. Preços continuam vindo do Decimal original.
+
+### Remoção local de fundo
+
+A interface `BackgroundRemover` tem implementações `NoOpBackgroundRemover` e `RembgBackgroundRemover`. A implementação real usa [rembg](https://github.com/danielgatis/rembg) 2.0.72, modelo U2NetP e ONNX Runtime em CPU. Não há API externa de inferência. O Docker provisiona o modelo de aproximadamente 4,6 MB durante o build; campanhas nunca baixam modelos ou imagens.
+
+Para habilitar no Docker:
+
+```bash
+BANNER_REMOVE_BACKGROUND=true docker compose up --build -d
+```
+
+Para instalação local, depois de instalar `requirements.txt`, provisione uma vez (este comando precisa de internet):
+
+```bash
+python scripts/download_background_model.py
+BANNER_REMOVE_BACKGROUND=true \
+BANNER_BACKGROUND_MODEL="$PWD/.cache/models/u2netp.onnx" \
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+```
+
+A sessão customizada do rembg abre somente o caminho local configurado. Se o modelo estiver ausente, falhar ou devolver imagem vazia/inválida, o pipeline registra `background_removal_failed` e continua com a imagem original corrigida. Esse resultado de fallback não é gravado como sucesso no cache, permitindo nova tentativa. Uma cópia é enviada ao remover para preservar o original mesmo em falhas parciais.
+
+### Configuração
+
+| Variável | Default | Validação / uso |
+|---|---|---|
+| `BANNER_REMOVE_BACKGROUND` | `false` | Booleano; use `true` ou `false` |
+| `BANNER_ASSET_CACHE_DIR` | `.cache/assets` na raiz do projeto | Caminho local não vazio; no Compose, `/app/.cache/assets` em volume Docker persistente |
+| `BANNER_ASSET_PADDING_RATIO` | `0.04` | Número finito entre 0 e 0,25, por eixo |
+| `BANNER_BACKGROUND_MODEL` | `/opt/rembg/u2netp.onnx` | Modelo local U2NetP; ausência resulta em fallback |
+| `OMP_NUM_THREADS` | `2` | Threads da inferência local |
+
+Booleanos ou padding inválidos impedem a inicialização com erro de validação. Configurações, sessão e identidade do modelo são carregadas por processo: reinicie o serviço após trocar parâmetros ou modelo.
+
+### Cache e logs
+
+Arquivos `.cache/assets/<sha256>.png` são identificados pelos bytes originais, versão do pipeline, padding, limite de resize, opção de remoção, versão do remover e hash dos bytes do modelo. Não depende de nome ou timestamp da foto. Reutilizar a imagem evita decodificação do original, crop e inferência; somente o PNG em cache é carregado. A escrita usa arquivo temporário e renomeação atômica. Cache corrompido é reprocessado; falha de escrita gera warning e não impede renderização. Os originais nunca são sobrescritos.
+
+Logs INFO: `asset_processing_started`, `asset_cache_hit`, `asset_cache_miss`, `background_removal_started`, `asset_normalized`. Falhas geram warning, incluindo `background_removal_failed`. Não se registram bytes nem base64. Para observar:
+
+```bash
+docker compose logs banner
+```
+
+O Compose usa o volume local `asset-cache`, separado do cache da instalação Python no host para evitar conflitos de permissões. Não há expiração automática do cache. Para recuperar espaço, remova os PNGs do diretório de cache com o serviço parado; a próxima campanha os recriará. Requisições simultâneas podem processar o mesmo cache miss mais de uma vez, sem corromper os arquivos.
+
+### Exemplo com formatos variados
+
+[`examples/campaign-real-assets.json`](examples/campaign-real-assets.json) mantém os mesmos dados comerciais do exemplo original e referencia quatro assets geométricos **sintéticos**, explicitamente identificados: vertical, horizontal, quadrado e conteúdo transparente com margem. Não são fotos comerciais. Para regenerá-los, execute `python scripts/create_synthetic_assets.py`.
+
+```bash
+curl --fail-with-body -sS -X POST http://localhost:8000/api/v1/banners \
+  -H 'Content-Type: application/json' \
+  --data-binary @examples/campaign-real-assets.json
+```
+
+A suíte usa fakes para remoção, cache isolado por teste e nenhum download de modelos. O teste de integração incorpora 12 imagens, verifica que Chromium as carregou e que ficam isoladas dos textos, preserva os dados comerciais e gera PNG 1080×1080 real. A inferência real é validada separadamente da suíte offline.
+
+Limitações: U2NetP pode remover partes do produto ou deixar resíduos em fotos difíceis; avalie fotos representativas antes de ativar em produção. Transparência parcial é considerada conteúdo no crop. O canvas é limitado a 600×600, mas sua forma acompanha o produto; fotos muito pequenas permanecem pequenas para preservar qualidade. O pipeline é determinístico com o mesmo modelo, dependências e ambiente; não garante equivalência de pixels entre diferentes plataformas.

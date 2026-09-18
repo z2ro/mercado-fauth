@@ -13,7 +13,7 @@
     <article class="card{% if card.product.featured %} featured{% endif %}" data-product-id="{{ card.product.id }}" data-slot="{{ card.placement.slot }}">
       <div class="product-image">
         {% if card.product.featured %}<span class="badge">DESTAQUE</span>{% endif %}
-        {% if card.image %}<img src="{{ card.image }}" alt="{{ card.product.name }}">
+        {% if card.image %}<img class="asset-{{ card.image.shape }}" src="{{ card.image.data_uri }}" alt="{{ card.product.name }}">
         {% else %}<div class="placeholder"><span>▧</span>IMAGEM INDISPONÍVEL</div>{% endif %}
       </div>
       <div class="details">
