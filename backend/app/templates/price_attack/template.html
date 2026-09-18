@@ -8,7 +8,7 @@
 <body>
 <main class="banner price-attack">
   <header class="attack-header">
-    <div class="brand-block"><span class="brand-mark">MF</span><strong data-fit>{{ campaign.brand }}</strong></div>
+    <div class="brand-block">{% if logo %}<img class="store-logo" src="{{ logo.data_uri }}" alt="Logo {{ campaign.brand }}">{% else %}<span class="brand-mark">MF</span>{% endif %}<strong data-fit>{{ campaign.brand }}</strong></div>
     <h1 data-fit>{{ campaign.title }}</h1>
     <div class="date-block"><span>ATÉ</span><strong>{{ campaign.valid_until }}</strong></div>
   </header>
@@ -17,7 +17,7 @@
            style="--grid-columns:{{ design.grid_columns }};--grid-rows:{{ design.grid_rows }}">
     {% for card in cards %}
     <article class="price-card role-{{ card.placement.role }} zone-{{ card.placement.zone }}{% if card.product.featured %} marked-featured{% endif %}"
-             data-product-id="{{ card.product.id }}" data-role="{{ card.placement.role }}"
+             data-product-id="{{ card.product.id }}" data-role="{{ card.placement.role }}" data-name="{{ card.product.name }}" data-price="{{ card.price_text }}" data-unit="{{ card.product.unit }}"
              style="grid-column:{{ card.grid_column }} / span {{ card.placement.w }};grid-row:{{ card.grid_row }} / span {{ card.placement.h }};--image-scale:{{ card.placement.image_scale }};--price-scale:{{ card.placement.price_scale }}">
       <div class="product-visual">
         {% if card.image %}<img class="asset-{{ card.image.shape }}" src="{{ card.image.data_uri }}" alt="{{ card.product.name }}">

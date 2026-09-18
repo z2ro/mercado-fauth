@@ -1,18 +1,20 @@
 # promo-banner-ai
 
-MVP determinístico para transformar campanhas de supermercado em banners PNG de **1080 × 1080**. Sem banco ou filas. Classificação opcional por LLM e remoção de fundo local; sem geração de imagens por IA. O template é inspirado na estrutura de `referencia.jpeg`, com identidade própria: amarelo promocional, faixa de validade, cards claros, preços em verde e rodapé da loja.
+Sistema para transformar campanhas de supermercado em banners PNG de **1080 × 1080**. Sem banco ou filas. Classificação, direção de arte e QA visual por LLM são opcionais e desativados por padrão; a execução offline usa regras e direção determinísticas. Não há geração de imagens por IA. O template mantém identidade própria de encarte promocional.
 
 ## Arquitetura
 
 ```text
-JSON → Pydantic → Classificação → ResolvedProduct → Layout Planner → DesignSpec → Jinja2/HTML/CSS → Chromium → PNG
+Input → Pydantic → Classification → Art Direction → Layout Engine → DesignSpec → Renderer → PNG → Deterministic QA → Optional Vision QA → Bounded refinement
 ```
 
 - `backend/app/models/`: modelos imutáveis, preços Decimal, contrato e DesignSpec.
 - `backend/app/layout/`: grid, restrições, afinidade, score e busca determinística.
 - `backend/app/design/system.py`: tokens de marca e escalas visuais compartilhados.
 - `backend/app/assets/processor.py`: leitura segura de imagens locais, orientação EXIF, redução proporcional e normalização em PNG embutido.
-- `backend/app/renderer/`: combinação do DesignSpec com dados originais e screenshot.
+- `backend/app/art_direction/`: contrato estrito de direção visual, fallback determinístico, provider Structured Outputs e cache independente.
+- `backend/app/visual_qa.py`: validação por DOM/PNG e provider multimodal opcional.
+- `backend/app/renderer/`: combinação do DesignSpec com dados originais, métricas DOM e screenshot.
 - `backend/app/templates/`: templates `supermarket_12`, `weekend_hero` e `price_attack`.
 - `backend/app/main.py`: API síncrona FastAPI.
 - `backend/tests/`: testes de domínio, planejamento, renderização e integração com Chromium real.
@@ -89,7 +91,7 @@ O exemplo completo, executável, está em [`examples/campaign.json`](examples/ca
 }
 ```
 
-O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `phone`, `instagram`) e `products`. `template` é opcional e aceita `supermarket_12`, `weekend_hero` ou `price_attack`. Sem seleção explícita, produtos marcados como `featured` levam a `weekend_hero`; `visual_direction.emphasis="price"` sem destaques escolhe `price_attack`; demais campanhas mantêm o template legado.
+O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `phone`, `instagram`) e `products`. `template` é opcional e aceita `supermarket_12`, `weekend_hero` ou `price_attack`. Payloads antigos sem intenção V2 explícita permanecem em `supermarket_12`, mesmo quando produtos possuem `featured=true`. Templates V2, `hero_products`, `featured_products` e `visual_direction` são opt-ins manuais. A direção automática exige `"art_direction_mode": "auto"`.
 
 Validações (HTTP **422**): exatamente 12 produtos, IDs únicos, nomes e unidades não vazios, categoria suportada, validade no formato dia/mês/ano e data real. Preço deve ser **string decimal positiva**, com no máximo duas casas decimais e oito dígitos totais. Números JSON, inclusive floats, são rejeitados. Não há arredondamento silencioso. Limites de texto: nome 70 caracteres, unidade 12 e demais campos comerciais 120. Campos desconhecidos são rejeitados.
 
@@ -139,6 +141,32 @@ O planner escolhe um pattern estrutural, posiciona até um hero e até dois feat
 
 Veja [`campaign-weekend-hero.json`](examples/campaign-weekend-hero.json) e [`campaign-price-attack.json`](examples/campaign-price-attack.json). Para escolher o hero, informe `template: "weekend_hero"` e `hero_products: ["p001"]`; `featured_products` aceita até dois IDs distintos. `visual_direction` recebe mood e ênfase validados, sem texto livre nem alteração de conteúdo comercial.
 
+## AI Art Director e Visual QA
+
+O modo padrão é `manual`; ele não chama o Art Director. No modo `auto`, o Art Director recebe somente título da campanha e, por produto, `product_id`, `name`, `category`, `subcategory` e `featured`. O preço, SKU, unidade, imagens, contato e endereço não são enviados. A saída `ArtDirectionSpec` é validada por schema fechado: template permitido, IDs existentes, no máximo um hero e dois featured, mood e perfil em enums. Nunca contém coordenadas ou CSS. O planner continua sendo o único responsável por geometria e hard rules. Falhas, timeout, cache inválido ou layout impossível usam fallback determinístico; hard rules não são relaxadas.
+
+`balanced`, `image_focus`, `price_focus`, `dense` e `premium` mapeiam para tokens limitados do design system. Moods `bold`, `fresh`, `premium` e `classic` usam variações fixas da paleta. A fonte estática é DejaVu Sans, instalada no build Docker e sem Google Fonts ou rede durante render. `BANNER_BRAND_LOGO` pode apontar para um logo raster local sob `assets/`; sem logo válido, permanece a marca textual `MF`.
+
+Todo PNG passa pelo QA determinístico antes de ser publicado: formato/dimensões, DOM em 1080 × 1080, overflow, imagens carregadas, dados comerciais renderizados exatamente, produto único por ID, hero e limites/overlaps dos cards. O Visual QA multimodal é opcional. Se reprovar, pode mudar somente o profile aprovado e renderizar no máximo duas vezes adicionais (`BANNER_VISUAL_QA_MAX_RENDERS=2`). Se falhar, o banner que passou no QA determinístico é preservado. Nenhum debug PNG intermediário é salvo por padrão.
+
+Art Direction e Visual QA usam o cliente compartilhado de OpenAI Responses e Structured Outputs. Ambos compartilham `BANNER_AI_API_KEY`, mas têm ativação, provider, modelo e timeout próprios. O cache `.cache/art-direction/` é separado e sua chave exclui preços. Sem credenciais/provider configurado, nenhum request externo ocorre e o sistema permanece offline.
+
+| Variável | Default | Uso |
+|---|---|---|
+| `BANNER_AI_ART_DIRECTION_ENABLED` | `false` | Habilita Art Director em requests `art_direction_mode=auto` |
+| `BANNER_AI_ART_DIRECTION_PROVIDER` | `openai` | Provider suportado nesta etapa |
+| `BANNER_AI_ART_DIRECTION_MODEL` | vazio | Modelo Structured Output |
+| `BANNER_AI_ART_DIRECTION_TIMEOUT_SECONDS` | `15` | Timeout externo, máximo validado 120 s |
+| `BANNER_ART_DIRECTION_CACHE_DIR` | `.cache/art-direction` | Cache atômico independente do classificador |
+| `BANNER_AI_VISUAL_QA_ENABLED` | `false` | Habilita visão após deterministic QA |
+| `BANNER_AI_VISUAL_QA_PROVIDER` | `openai` | Provider visual suportado nesta etapa |
+| `BANNER_AI_VISUAL_QA_MODEL` | vazio | Modelo multimodal Structured Output |
+| `BANNER_AI_VISUAL_QA_TIMEOUT_SECONDS` | `20` | Timeout externo, máximo validado 120 s |
+| `BANNER_VISUAL_QA_MAX_RENDERS` | `2` | Número máximo de renders de refinamento, de 0 a 2 |
+| `BANNER_BRAND_LOGO` | vazio | Caminho local relativo à raiz de assets |
+
+Exemplo offline: [`campaign-ai-art-director.json`](examples/campaign-ai-art-director.json). O modo `auto` usa fallback determinístico quando a IA está desabilitada.
+
 ## Imagens e renderização
 
 Substitua os placeholders por fotos reais dentro de `assets/`. Não há download de fotos nem geração por IA. Caminhos que escapem da raiz de assets, incluindo symlinks, são recusados. Arquivos ausentes, inválidos, maiores que 10 MB ou 20 megapixels geram warning e placeholder identificável, sem interromper o banner. SVG não é aceito como asset de produto; use PNG, JPEG ou outro formato raster suportado por Pillow.
@@ -172,11 +200,15 @@ O teste de POST usa Chromium real e verifica um PNG real. Portanto instale Playw
 
 **Layout Engine 2.0 — implementado e testado:** DesignSpec V2, roles e zones, placements retangulares, hero, templates `weekend_hero` e `price_attack`, tokens de marca e hard rules de adjacência retangular.
 
-**Próxima fase:** AI Art Director com validação de template/hero/featured/direção visual e Visual QA. Esta execução não usa IA para escolher layout nem gerar conteúdo.
+**AI Art Director + Visual QA — implementado e testado:** intenção visual com schema restrito, fallback determinístico, Structured Outputs opcional, QA estrutural e multimodal opcional e refinamento limitado. O LLM não recebe os campos comerciais excluídos e não controla geometria ou estilo arbitrário.
 
 **Depois:** templates para 4, 6, 8 e 16 produtos; OR-Tools e placements com múltiplos slots; integrações externas e publicação.
 
 Google Sheets, ERP, armazenamento, histórico de campanhas, aprovação humana e publicação automática em redes sociais seguem fora do MVP.
+
+### CI
+
+O workflow `.github/workflows/ci.yml` executa compilação Python, suíte pytest com Chromium, smoke test offline do Classification Eval e build Docker em push e pull request. Nenhum provider real é chamado. Branch protection continua recomendada; este repositório não configura regras remotas automaticamente.
 
 
 ## Pipeline de fotos reais

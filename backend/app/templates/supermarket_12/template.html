@@ -5,12 +5,12 @@
 <main class="banner">
   <header>
     <div class="headline"><span class="eyebrow">PREÇO BAIXO, CARRINHO CHEIO</span><h1 data-fit>{{ campaign.title }}</h1></div>
-    <div class="brand"><span>SEU MERCADO</span><strong data-fit>{{ campaign.brand }}</strong></div>
+    <div class="brand"><span>SEU MERCADO</span>{% if logo %}<img class="store-logo" src="{{ logo.data_uri }}" alt="Logo {{ campaign.brand }}">{% else %}<strong data-fit>{{ campaign.brand }}</strong>{% endif %}</div>
   </header>
   <div class="validity">OFERTAS VÁLIDAS ATÉ <strong>{{ campaign.valid_until }}</strong><span>OU ENQUANTO DURAREM OS ESTOQUES</span></div>
   <section class="grid" aria-label="Produtos em promoção">
   {% for card in cards %}
-    <article class="card{% if card.product.featured %} featured{% endif %}" data-product-id="{{ card.product.id }}" data-slot="{{ card.placement.slot }}">
+    <article class="card{% if card.product.featured %} featured{% endif %}" data-product-id="{{ card.product.id }}" data-slot="{{ card.placement.slot }}" data-name="{{ card.product.name }}" data-price="{{ card.price.integer }},{{ card.price.decimal }}" data-unit="{{ card.product.unit }}">
       <div class="product-image">
         {% if card.product.featured %}<span class="badge">DESTAQUE</span>{% endif %}
         {% if card.image %}<img class="asset-{{ card.image.shape }}" src="{{ card.image.data_uri }}" alt="{{ card.product.name }}">

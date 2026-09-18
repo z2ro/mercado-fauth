@@ -129,5 +129,6 @@ async def resolve_products(
         hero_products=request.hero_products,
         featured_products=request.featured_products,
         visual_direction=request.visual_direction,
+        art_direction_mode=request.art_direction_mode,
         products=tuple(resolved),
     ), metadata

@@ -8,7 +8,7 @@
 <body>
 <main class="banner weekend">
   <header class="masthead">
-    <div class="brand-lockup"><span class="brand-mark">MF</span><strong data-fit>{{ campaign.brand }}</strong></div>
+    <div class="brand-lockup">{% if logo %}<img class="store-logo" src="{{ logo.data_uri }}" alt="Logo {{ campaign.brand }}">{% else %}<span class="brand-mark">MF</span>{% endif %}<strong data-fit>{{ campaign.brand }}</strong></div>
     <div class="headline"><span class="eyebrow">ENCARTE DE OFERTAS</span><h1 data-fit>{{ campaign.title }}</h1></div>
     <div class="date-lockup"><span>OFERTAS</span><strong>{{ campaign.valid_until }}</strong></div>
   </header>
@@ -17,7 +17,7 @@
            style="--grid-columns:{{ design.grid_columns }};--grid-rows:{{ design.grid_rows }}">
     {% for card in cards %}
     <article class="product-card role-{{ card.placement.role }} zone-{{ card.placement.zone }}{% if card.product.featured %} marked-featured{% endif %}"
-             data-product-id="{{ card.product.id }}" data-role="{{ card.placement.role }}"
+             data-product-id="{{ card.product.id }}" data-role="{{ card.placement.role }}" data-name="{{ card.product.name }}" data-price="{{ card.price_text }}" data-unit="{{ card.product.unit }}"
              style="grid-column:{{ card.grid_column }} / span {{ card.placement.w }};grid-row:{{ card.grid_row }} / span {{ card.placement.h }};--image-scale:{{ card.placement.image_scale }};--price-scale:{{ card.placement.price_scale }}">
       <div class="product-visual">
         <span class="role-label">{% if card.placement.role == 'hero' %}OFERTA PRINCIPAL{% elif card.placement.role == 'featured' %}DESTAQUE{% endif %}</span>

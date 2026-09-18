@@ -68,3 +68,59 @@ def classification_settings() -> ClassificationSettings:
 
 
 CLASSIFICATION_SETTINGS = classification_settings()
+
+
+class ArtDirectionSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    enabled: bool = False
+    provider: str = 'openai'
+    model: str = ''
+    api_key: SecretStr = SecretStr('')
+    timeout_seconds: float = Field(default=15, gt=0, le=120, allow_inf_nan=False)
+    cache_dir: Path = ROOT / '.cache' / 'art-direction'
+
+    @field_validator('cache_dir', mode='before')
+    @classmethod
+    def valid_cache(cls, value):
+        if isinstance(value, str) and not value.strip():
+            raise ValueError('Cache de art direction não pode ser vazio.')
+        return Path(value).resolve()
+
+
+def art_direction_settings() -> ArtDirectionSettings:
+    return ArtDirectionSettings(
+        enabled=os.getenv('BANNER_AI_ART_DIRECTION_ENABLED', 'false'),
+        provider=os.getenv('BANNER_AI_ART_DIRECTION_PROVIDER', 'openai'),
+        model=os.getenv('BANNER_AI_ART_DIRECTION_MODEL', ''),
+        api_key=os.getenv('BANNER_AI_API_KEY', ''),
+        timeout_seconds=os.getenv('BANNER_AI_ART_DIRECTION_TIMEOUT_SECONDS', '15'),
+        cache_dir=os.getenv('BANNER_ART_DIRECTION_CACHE_DIR', str(ROOT / '.cache' / 'art-direction')),
+    )
+
+
+ART_DIRECTION_SETTINGS = art_direction_settings()
+
+
+class VisualQASettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    enabled: bool = False
+    provider: str = 'openai'
+    model: str = ''
+    api_key: SecretStr = SecretStr('')
+    timeout_seconds: float = Field(default=20, gt=0, le=120, allow_inf_nan=False)
+    max_renders: int = Field(default=2, ge=0, le=2)
+
+
+def visual_qa_settings() -> VisualQASettings:
+    return VisualQASettings(
+        enabled=os.getenv('BANNER_AI_VISUAL_QA_ENABLED', 'false'),
+        provider=os.getenv('BANNER_AI_VISUAL_QA_PROVIDER', 'openai'),
+        model=os.getenv('BANNER_AI_VISUAL_QA_MODEL', ''),
+        api_key=os.getenv('BANNER_AI_API_KEY', ''),
+        timeout_seconds=os.getenv('BANNER_AI_VISUAL_QA_TIMEOUT_SECONDS', '20'),
+        max_renders=os.getenv('BANNER_VISUAL_QA_MAX_RENDERS', '2'),
+    )
+
+
+VISUAL_QA_SETTINGS = visual_qa_settings()
+BRAND_LOGO = os.getenv('BANNER_BRAND_LOGO', '')

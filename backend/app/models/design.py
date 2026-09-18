@@ -6,6 +6,7 @@ from ..design.system import FEATURED_COUNT, HERO_COUNT
 
 TemplateName = Literal['supermarket_12', 'weekend_hero', 'price_attack']
 PlacementRole = Literal['hero', 'featured', 'standard', 'compact']
+PresentationProfile = Literal['balanced', 'image_focus', 'price_focus', 'dense', 'premium']
 
 
 class Placement(BaseModel):
@@ -67,6 +68,7 @@ class DesignSpecV2(BaseModel):
     hero_products: tuple[str, ...] = Field(max_length=HERO_COUNT)
     featured_products: tuple[str, ...] = Field(max_length=FEATURED_COUNT)
     visual_direction: VisualDirection = Field(default_factory=VisualDirection)
+    presentation_profile: PresentationProfile = 'balanced'
     placements: tuple[RectPlacement, ...] = Field(min_length=12, max_length=12)
 
     @model_validator(mode='after')

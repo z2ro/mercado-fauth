@@ -4,7 +4,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from ..assets.processor import prepare_asset
-from ..config import ASSET_DIR, TEMPLATE_DIR
+from ..config import ASSET_DIR, BRAND_LOGO, TEMPLATE_DIR
 from ..design.system import DESIGN_SYSTEM
 from ..layout.rules import hard_rules_valid, rectangles_hard_rules_valid
 from ..models.campaign import BannerRequest
@@ -26,6 +26,12 @@ def _asset(product, asset_dir):
     return prepare_asset(product.image, asset_dir)
 
 
+def _brand_logo(asset_dir):
+    if not BRAND_LOGO:
+        return None
+    return prepare_asset(BRAND_LOGO, asset_dir)
+
+
 def _legacy_html(request, design, asset_dir):
     by_id = {product.id: product for product in request.products}
     if {placement.product_id for placement in design.products} != set(by_id):
@@ -44,6 +50,7 @@ def _legacy_html(request, design, asset_dir):
         cards=cards,
         css=(TEMPLATE_DIR / 'supermarket_12' / 'style.css').read_text(),
         design_tokens=DESIGN_SYSTEM.css_variables(),
+        logo=_brand_logo(asset_dir),
     )
 
 
@@ -63,13 +70,16 @@ def _v2_html(request, design, asset_dir):
         raise ValueError('DesignSpec V2 viola separação ou overlap entre departamentos.')
     cards = []
     for placement in sorted(design.placements, key=lambda item: (item.y, item.x)):
+        product = by_id[placement.product_id]
+        price = format_price(product.price)
         cards.append({
-            'product': by_id[placement.product_id],
+            'product': product,
             'placement': placement,
             'grid_column': placement.x + 1,
             'grid_row': placement.y + 1,
-            'price': format_price(by_id[placement.product_id].price),
-            'image': _asset(by_id[placement.product_id], asset_dir),
+            'price': price,
+            'price_text': f'{price["integer"]},{price["decimal"]}',
+            'image': _asset(product, asset_dir),
         })
     css = (TEMPLATE_DIR / design.template / 'style.css').read_text()
     return ENV.get_template(f'{design.template}/template.html').render(
@@ -77,7 +87,8 @@ def _v2_html(request, design, asset_dir):
         design=design,
         cards=cards,
         css=css,
-        design_tokens=DESIGN_SYSTEM.css_variables(),
+        design_tokens=DESIGN_SYSTEM.css_variables(design.presentation_profile, design.visual_direction.mood),
+        logo=_brand_logo(asset_dir),
     )
 
 

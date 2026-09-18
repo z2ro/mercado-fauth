@@ -9,6 +9,7 @@ h1 { font-size: 56px; line-height: 1.05; letter-spacing: -2px; text-transform: u
 .brand { width: 290px; padding: 12px 20px; border-left: 2px solid var(--brand-ink); }
 .brand > span { display: block; font-size: 12px; letter-spacing: 2px; margin-bottom: 8px; }
 .brand strong { display: block; font-size: 26px; height: 62px; overflow-wrap: anywhere; }
+.brand .store-logo { display: block; width: 170px; height: 54px; object-fit: contain; object-position: left center; }
 .validity { background: var(--promo-accent); color: var(--on-dark); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 19px; border-radius: 22px; font-weight: 700; }
 .validity span { font-size: 12px; margin-left: 20px; }
 .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -20,10 +21,10 @@ h1 { font-size: 56px; line-height: 1.05; letter-spacing: -2px; text-transform: u
 .badge { position: absolute; z-index: 1; top: 7px; left: 7px; color: var(--on-dark); background: var(--promo-accent); padding: 4px 7px; border-radius: var(--radius-small); font-size: 10px; font-weight: bold; }
 .details { background: var(--brand-secondary); color: var(--on-dark); padding: 6px 12px 4px; border-radius: 12px 12px 0 0; }
 h2 { margin: 0; height: 32px; font-size: 15px; line-height: 1.06; text-transform: uppercase; overflow-wrap: anywhere; }
-.price { height: 60px; display: flex; align-items: baseline; white-space: nowrap; font-weight: 900; color: var(--price); font-size: 61px; letter-spacing: -2px; }
+.price { height: 60px; display: flex; align-items: baseline; white-space: nowrap; font-weight: 900; color: var(--price); font-size: 61px; letter-spacing: -2px; --fit-price-scale: 1; }
 .currency { color: var(--on-dark); font-size: .25em; letter-spacing: 0; margin-right: 4px; }
-.integer { font-size: 1em; line-height: 1; }
-.decimal { font-size: .46em; letter-spacing: -1px; }
+.integer { font-size: calc(1em * var(--fit-price-scale)); line-height: 1; }
+.decimal { font-size: calc(.46em * var(--fit-price-scale)); letter-spacing: -1px; }
 .unit { margin-left: auto; padding-left: 5px; color: var(--on-dark); font-size: .20em; letter-spacing: 0; }
 footer { display: grid; grid-template-rows: 58px 36px; gap: 8px; }
 .footer-top { display: flex; justify-content: space-between; align-items: center; gap: 24px; }

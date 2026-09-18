@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.58.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python dependencies
+        run: pip install --no-cache-dir -r requirements.txt
+      - name: Compile Python
+        run: python -m compileall -q backend eval
+      - name: Run tests
+        run: python -m pytest -q
+      - name: Run offline classification evaluation smoke test
+        run: python -m eval.run_eval --provider fake --dataset eval/datasets/products.json --batch-size 12 --no-cache
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build service image
+        run: docker build --tag mercado-fauth:ci .

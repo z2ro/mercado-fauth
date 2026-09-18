@@ -14,11 +14,23 @@ services:
       BANNER_CLASSIFICATION_MIN_CONFIDENCE: ${BANNER_CLASSIFICATION_MIN_CONFIDENCE:-0.70}
       BANNER_AI_TIMEOUT_SECONDS: ${BANNER_AI_TIMEOUT_SECONDS:-15}
       BANNER_CLASSIFICATION_CACHE_DIR: /app/.cache/classifications
+      BANNER_AI_ART_DIRECTION_ENABLED: ${BANNER_AI_ART_DIRECTION_ENABLED:-false}
+      BANNER_AI_ART_DIRECTION_PROVIDER: ${BANNER_AI_ART_DIRECTION_PROVIDER:-openai}
+      BANNER_AI_ART_DIRECTION_MODEL: ${BANNER_AI_ART_DIRECTION_MODEL:-}
+      BANNER_AI_ART_DIRECTION_TIMEOUT_SECONDS: ${BANNER_AI_ART_DIRECTION_TIMEOUT_SECONDS:-15}
+      BANNER_ART_DIRECTION_CACHE_DIR: /app/.cache/art-direction
+      BANNER_AI_VISUAL_QA_ENABLED: ${BANNER_AI_VISUAL_QA_ENABLED:-false}
+      BANNER_AI_VISUAL_QA_PROVIDER: ${BANNER_AI_VISUAL_QA_PROVIDER:-openai}
+      BANNER_AI_VISUAL_QA_MODEL: ${BANNER_AI_VISUAL_QA_MODEL:-}
+      BANNER_AI_VISUAL_QA_TIMEOUT_SECONDS: ${BANNER_AI_VISUAL_QA_TIMEOUT_SECONDS:-20}
+      BANNER_VISUAL_QA_MAX_RENDERS: ${BANNER_VISUAL_QA_MAX_RENDERS:-2}
+      BANNER_BRAND_LOGO: ${BANNER_BRAND_LOGO:-}
     volumes:
       - ./assets:/app/assets:ro
       - ./output:/app/output
       - asset-cache:/app/.cache/assets
       - classification-cache:/app/.cache/classifications
+      - art-direction-cache:/app/.cache/art-direction
     shm_size: 256mb
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -29,3 +41,4 @@ services:
 volumes:
   asset-cache:
   classification-cache:
+  art-direction-cache:

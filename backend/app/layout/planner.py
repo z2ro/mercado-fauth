@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from itertools import combinations
 
+from ..art_direction.models import ArtDirectionSpec
 from ..design.system import DESIGN_SYSTEM, FEATURED_COUNT
 from ..models.campaign import BannerRequest
 from ..models.design import DesignSpec, DesignSpecV2, Placement, RectPlacement, VisualDirection
@@ -35,7 +36,7 @@ class AssignedPlacement:
 def select_template(request: BannerRequest) -> str:
     if request.template:
         return request.template
-    if request.hero_products or request.featured_products or any(product.featured for product in request.products):
+    if request.hero_products or request.featured_products:
         return 'weekend_hero'
     if request.visual_direction and request.visual_direction.emphasis == 'price':
         return 'price_attack'
@@ -186,11 +187,13 @@ def _improve_layout(seed, pattern, by_id, locked):
     return current, current_score
 
 
-def _plan_pattern(request: BannerRequest, template: str) -> DesignSpecV2:
+def _plan_pattern(request: BannerRequest, template: str, presentation_profile: str = 'balanced',
+                  art_direction: ArtDirectionSpec | None = None) -> DesignSpecV2:
     pattern = PATTERNS[template]
     products = tuple(request.products)
     by_id = {product.id: product for product in products}
-    hero_ids, featured_ids = _selected_products(request, template)
+    hero_ids, featured_ids = ((art_direction.hero_products, art_direction.featured_products)
+                              if art_direction else _selected_products(request, template))
     locked = _locked_roles(pattern, hero_ids, featured_ids)
     cleaning_count = sum(product.category == 'limpeza' for product in products)
     candidates = []
@@ -233,12 +236,14 @@ def _plan_pattern(request: BannerRequest, template: str) -> DesignSpecV2:
         hero_products=output_hero_ids,
         featured_products=output_featured_ids,
         visual_direction=visual_direction,
+        presentation_profile=presentation_profile,
         placements=placements,
     )
 
 
-def plan_layout(request: BannerRequest) -> DesignSpec | DesignSpecV2:
+def plan_layout(request: BannerRequest, presentation_profile: str = 'balanced',
+                art_direction: ArtDirectionSpec | None = None) -> DesignSpec | DesignSpecV2:
     template = select_template(request)
     if template == 'supermarket_12':
         return _plan_legacy(request)
-    return _plan_pattern(request, template)
+    return _plan_pattern(request, template, presentation_profile, art_direction)

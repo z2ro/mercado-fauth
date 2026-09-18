@@ -12,13 +12,24 @@ class DesignSystem:
     radii: dict[str, int]
     shadows: dict[str, str]
     role_scales: dict[str, tuple[float, float]]
+    profiles: dict[str, tuple[float, float, float, float, float]]
+    moods: dict[str, dict[str, str]]
 
-    def css_variables(self) -> str:
+    def css_variables(self, profile: str = 'balanced', mood: str = 'classic') -> str:
+        if profile not in self.profiles or mood not in self.moods:
+            raise ValueError('Perfil ou mood visual desconhecido.')
         tokens = {f'--{name}': value for name, value in self.colors.items()}
+        tokens.update({f'--{name}': value for name, value in self.moods[mood].items()})
         tokens.update({f'--font-{name}': value for name, value in self.typography.items()})
         tokens.update({f'--space-{name}': f'{value}px' for name, value in self.spacing.items()})
         tokens.update({f'--radius-{name}': f'{value}px' for name, value in self.radii.items()})
         tokens.update({f'--shadow-{name}': value for name, value in self.shadows.items()})
+        image, price, spacing, headline, shadow = self.profiles[profile]
+        tokens.update({'--profile-image-scale': str(image), '--profile-price-scale': str(price),
+                       '--profile-spacing': str(spacing), '--profile-headline-scale': str(headline),
+                       '--profile-shadow-scale': str(shadow),
+                       '--profile-card-shadow': ('0 4px 12px rgba(16,46,48,.08)' if shadow < .8 else self.shadows['card']),
+                       '--profile-hero-shadow': ('0 8px 20px rgba(16,46,48,.12)' if shadow < .8 else self.shadows['hero'])})
         return ':root{' + ';'.join(f'{name}:{value}' for name, value in tokens.items()) + '}'
 
 
@@ -40,7 +51,7 @@ DESIGN_SYSTEM = DesignSystem(
         'line-strong': 'rgba(255,255,255,.75)',
         'line-footer': 'rgba(16,46,48,.15)',
     },
-    typography={'body': "Arial, sans-serif", 'display': "Arial Black, Arial, sans-serif"},
+    typography={'body': "'DejaVu Sans', sans-serif", 'display': "'DejaVu Sans', sans-serif"},
     spacing={'xs': 4, 'sm': 8, 'md': 12, 'lg': 20, 'xl': 28},
     radii={'card': 16, 'pill': 22, 'small': 8},
     shadows={
@@ -54,5 +65,20 @@ DESIGN_SYSTEM = DesignSystem(
         'featured': (1.08, 1.12),
         'standard': (1.0, 1.0),
         'compact': (.90, 1.05),
+    },
+    profiles={
+        'balanced': (1.0, 1.0, 1.0, 1.0, 1.0),
+        'image_focus': (1.12, .97, 1.0, 1.0, 1.0),
+        'price_focus': (.94, 1.12, 1.0, 1.0, 1.0),
+        'dense': (.98, .98, .86, .96, 1.0),
+        'premium': (1.02, 1.0, 1.12, 1.02, .62),
+    },
+    moods={
+        'bold': {'promo-accent': '#a51f1d', 'promo-accent-dark': '#781a19', 'surface-soft': '#fff7df'},
+        'fresh': {'brand-primary': '#e6f0ca', 'brand-primary-light': '#f5fae9', 'brand-secondary': '#18543f',
+                  'promo-accent': '#34764d', 'promo-accent-dark': '#24593a', 'surface': '#ffffff', 'surface-soft': '#eff7e9'},
+        'premium': {'brand-primary': '#e9dfbd', 'brand-primary-light': '#f6f0df', 'brand-secondary': '#31453e',
+                    'promo-accent': '#8c453b', 'promo-accent-dark': '#71382f', 'surface': '#fffdf8', 'surface-soft': '#f8f3e8'},
+        'classic': {},
     },
 )

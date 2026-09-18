@@ -105,7 +105,8 @@ def test_planner_is_deterministic_and_respects_roles_and_hard_rules(example, tem
 
 def test_template_selection_is_deterministic(request_model):
     automatic = request_model.model_copy(update={'template': None})
-    assert select_template(automatic) == 'weekend_hero'
+    assert select_template(automatic) == 'supermarket_12'
+    assert any(product.featured for product in automatic.products)
     price = automatic.model_copy(update={'products': tuple(p.model_copy(update={'featured': False}) for p in automatic.products),
                                          'visual_direction': VisualDirection(emphasis='price')})
     assert select_template(price) == 'price_attack'
