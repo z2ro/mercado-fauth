@@ -52,6 +52,18 @@ def test_faith_reference_render_preserves_campaign_data():
     assert html.count('class="currency"') == 12
     assert html.count('class="integer"') == 12
     assert html.count('class="decimal"') == 12
+    assert html.count('class="placeholder-art') == 12
+    assert 'PLACEHOLDER' not in html
+
+
+def test_faith_reference_keeps_supplied_product_photo(request_model):
+    first = request_model.products[0].model_copy(update={'image': 'assets/products/synthetic/square.png'})
+    request = request_model.model_copy(update={'template': 'faith_reference_12', 'products': (first, *request_model.products[1:])})
+    html = render_html(request, plan_layout(request))
+
+    assert 'class="asset-square"' in html
+    assert 'data:image/png;base64,' in html
+    assert html.count('class="placeholder-art') == 11
 
 
 def test_legacy_payload_stays_on_supermarket_12(payload):

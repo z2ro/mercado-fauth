@@ -17,8 +17,21 @@
   {% for card in cards %}
     <article class="offer" data-product-id="{{ card.product.id }}" data-slot="{{ card.placement.slot }}" data-name="{{ card.product.name }}" data-price="{{ card.price.integer }},{{ card.price.decimal }}" data-unit="{{ card.product.unit }}">
       <div class="product-visual">
-        {% if card.image %}<img class="asset-{{ card.image.shape }}" src="{{ card.image.data_uri }}" alt="{{ card.product.name }}">
-        {% else %}<div class="placeholder"><span>▧</span>IMAGEM INDISPONÍVEL</div>{% endif %}
+        {% if card.category_placeholder %}
+          <div class="placeholder-art category-{{ card.product.category.value }}" aria-label="Ilustração provisória de {{ card.product.category.value }}">
+            {% if card.product.category.value == 'acougue' %}
+              <span class="cut cut-one"></span><span class="cut cut-two"></span><span class="cut cut-three"></span>
+            {% elif card.product.category.value == 'mercearia' %}
+              <span class="package jar jar-one"><i></i></span><span class="package jar jar-two"><i></i></span><span class="package jar jar-three"><i></i></span>
+            {% elif card.product.category.value == 'bebidas' %}
+              <span class="package can can-one"><i></i></span><span class="package can can-two"><i></i></span><span class="package can can-three"><i></i></span>
+            {% else %}
+              <span class="package box box-one"><i></i></span><span class="package box box-two"><i></i></span>
+            {% endif %}
+          </div>
+          <span class="placeholder-category">{{ card.product.category.value.replace('_', ' ') }}</span>
+        {% elif card.image %}<img class="asset-{{ card.image.shape }}" src="{{ card.image.data_uri }}" alt="{{ card.product.name }}">
+        {% else %}<div class="missing-photo"><span>FOTO DO PRODUTO</span></div>{% endif %}
       </div>
       <div class="offer-paint">
         <div class="product-label">

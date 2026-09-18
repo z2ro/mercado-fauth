@@ -44,7 +44,14 @@ def _legacy_html(request, design, asset_dir):
     for placement, product in zip(placements, ordered):
         if placement.featured != product.featured:
             raise ValueError('DesignSpec alterou destaque do produto.')
-        cards.append({'product': product, 'placement': placement, 'price': format_price(product.price), 'image': _asset(product, asset_dir)})
+        category_placeholder = (
+            design.template == 'faith_reference_12'
+            and product.category is not None
+            and product.image.removeprefix('assets/') == f'products/{product.category.value}.png'
+        )
+        cards.append({'product': product, 'placement': placement, 'price': format_price(product.price),
+                      'image': None if category_placeholder else _asset(product, asset_dir),
+                      'category_placeholder': category_placeholder})
     template = design.template
     return ENV.get_template(f'{template}/template.html').render(
         campaign=request.campaign,
