@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>{{ campaign.title }}</title><style>{{ css | safe }}</style></head>
+<body>
+<main class="banner">
+  <header>
+    <div class="headline"><span class="eyebrow">PREÇO BAIXO, CARRINHO CHEIO</span><h1 data-fit>{{ campaign.title }}</h1></div>
+    <div class="brand"><span>SEU MERCADO</span><strong data-fit>{{ campaign.brand }}</strong></div>
+  </header>
+  <div class="validity">OFERTAS VÁLIDAS ATÉ <strong>{{ campaign.valid_until }}</strong><span>OU ENQUANTO DURAREM OS ESTOQUES</span></div>
+  <section class="grid" aria-label="Produtos em promoção">
+  {% for card in cards %}
+    <article class="card{% if card.product.featured %} featured{% endif %}" data-product-id="{{ card.product.id }}" data-slot="{{ card.placement.slot }}">
+      <div class="product-image">
+        {% if card.product.featured %}<span class="badge">DESTAQUE</span>{% endif %}
+        {% if card.image %}<img src="{{ card.image }}" alt="{{ card.product.name }}">
+        {% else %}<div class="placeholder"><span>▧</span>IMAGEM INDISPONÍVEL</div>{% endif %}
+      </div>
+      <div class="details">
+        <h2 data-fit>{{ card.product.name }}</h2>
+        <div class="price" data-fit aria-label="R$ {{ card.price.integer }},{{ card.price.decimal }} {{ card.product.unit }}">
+          <span class="currency">R$</span><span class="integer">{{ card.price.integer }}</span><span class="decimal">,{{ card.price.decimal }}</span><span class="unit">{{ card.product.unit }}</span>
+        </div>
+      </div>
+    </article>
+  {% endfor %}
+  </section>
+  <footer>
+    <div class="footer-top"><strong data-fit>{{ campaign.brand }}</strong><div><span data-fit>{{ campaign.instagram }}</span><span data-fit>{{ campaign.phone }}</span></div></div>
+    <div class="address" data-fit>{{ campaign.address }}</div>
+  </footer>
+</main>
+</body>
+</html>

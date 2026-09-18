@@ -1,0 +1,14 @@
+services:
+  banner:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./assets:/app/assets:ro
+      - ./output:/app/output
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
