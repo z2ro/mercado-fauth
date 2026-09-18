@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 from ..design.system import FEATURED_COUNT, HERO_COUNT
 
-TemplateName = Literal['supermarket_12', 'weekend_hero', 'price_attack']
+TemplateName = Literal['supermarket_12', 'faith_reference_12', 'weekend_hero', 'price_attack']
 PlacementRole = Literal['hero', 'featured', 'standard', 'compact']
 PresentationProfile = Literal['balanced', 'image_focus', 'price_focus', 'dense', 'premium']
 
@@ -20,7 +20,7 @@ class Placement(BaseModel):
 
 class DesignSpec(BaseModel):
     model_config = ConfigDict(frozen=True, extra='forbid')
-    template: Literal['supermarket_12'] = 'supermarket_12'
+    template: Literal['supermarket_12', 'faith_reference_12'] = 'supermarket_12'
     width: Literal[1080] = 1080
     height: Literal[1080] = 1080
     products: tuple[Placement, ...] = Field(min_length=12, max_length=12)

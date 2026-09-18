@@ -45,7 +45,13 @@ def select_template(request: BannerRequest) -> str:
     return 'supermarket_12'
 
 
-def _plan_legacy(request: BannerRequest) -> DesignSpec:
+def _plan_legacy(request: BannerRequest, template: str = 'supermarket_12') -> DesignSpec:
+    if template == 'faith_reference_12' and hard_rules_valid(request.products):
+        # The reference payload's order is its authored 4x3 composition.
+        return DesignSpec(template=template, products=tuple(
+            Placement(product_id=product.id, slot=slot.index, x=slot.x, y=slot.y, featured=product.featured)
+            for slot, product in zip(GRID, request.products)
+        ))
     products = sorted(request.products, key=lambda p: (p.category, not p.featured, p.id))
     cleaning = [p for p in products if p.category == 'limpeza']
     sensitive = [p for p in products if p.category in SENSITIVE]
@@ -85,7 +91,7 @@ def _plan_legacy(request: BannerRequest) -> DesignSpec:
         if score > best_score:
             best, best_score = current, score
     assert best is not None and hard_rules_valid(best)
-    return DesignSpec(products=tuple(
+    return DesignSpec(template=template, products=tuple(
         Placement(product_id=product.id, slot=slot.index, x=slot.x, y=slot.y, featured=product.featured)
         for slot, product in zip(GRID, best)
     ))
@@ -244,6 +250,6 @@ def _plan_pattern(request: BannerRequest, template: str, presentation_profile: s
 def plan_layout(request: BannerRequest, presentation_profile: str = 'balanced',
                 art_direction: ArtDirectionSpec | None = None) -> DesignSpec | DesignSpecV2:
     template = select_template(request)
-    if template == 'supermarket_12':
-        return _plan_legacy(request)
+    if template in {'supermarket_12', 'faith_reference_12'}:
+        return _plan_legacy(request, template)
     return _plan_pattern(request, template, presentation_profile, art_direction)

@@ -1,0 +1,151 @@
+{
+  "template": "faith_reference_12",
+  "campaign": {
+    "title": "Ofertas válidas até 20/9 ou enquanto durarem os estoques",
+    "valid_until": "20/09/2026",
+    "brand": "Mercado Fauth",
+    "address": "Av. Ouro Fino, 670 - Bosque dos Eucaliptos",
+    "phone": "(12) 3916-5334",
+    "instagram": "@mercadofauth",
+    "secondary_phone": "(12) 99725-0029",
+    "hours": {
+      "weekdays": "SEG. A SEX. 7:00 ATÉ 20:00",
+      "saturday": "SÁB. 7:00 ATÉ 18:00",
+      "sunday": "DOM. 7:00 ATÉ 14:00"
+    }
+  },
+  "products": [
+    {
+      "id": "p001",
+      "sku": "001",
+      "name": "Paleta Bovina",
+      "price": "39.90",
+      "unit": "KG",
+      "category": "acougue",
+      "subcategory": "carne_bovina",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p002",
+      "sku": "002",
+      "name": "Pernil Sem Osso",
+      "price": "17.90",
+      "unit": "KG",
+      "category": "acougue",
+      "subcategory": "carne_suina",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p003",
+      "sku": "003",
+      "name": "Azeitona Fatiada La Violet",
+      "price": "6.99",
+      "unit": "UN",
+      "category": "mercearia",
+      "subcategory": "conservas",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p004",
+      "sku": "004",
+      "name": "Molho de Tomate Predilecta",
+      "price": "1.99",
+      "unit": "UN",
+      "category": "mercearia",
+      "subcategory": "molhos",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p005",
+      "sku": "005",
+      "name": "Coxão Mole",
+      "price": "47.90",
+      "unit": "KG",
+      "category": "acougue",
+      "subcategory": "carne_bovina",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p006",
+      "sku": "006",
+      "name": "Bisteca Suína",
+      "price": "17.90",
+      "unit": "KG",
+      "category": "acougue",
+      "subcategory": "carne_suina",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p007",
+      "sku": "007",
+      "name": "Azeitona Sem Caroço Predilecta",
+      "price": "7.49",
+      "unit": "UN",
+      "category": "mercearia",
+      "subcategory": "conservas",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p008",
+      "sku": "008",
+      "name": "Milho Verde Predilecta",
+      "price": "2.99",
+      "unit": "UN",
+      "category": "mercearia",
+      "subcategory": "enlatados",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p009",
+      "sku": "009",
+      "name": "Coxinha da Asa",
+      "price": "14.90",
+      "unit": "KG",
+      "category": "acougue",
+      "subcategory": "aves",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p010",
+      "sku": "010",
+      "name": "Panceta Suína",
+      "price": "19.90",
+      "unit": "KG",
+      "category": "acougue",
+      "subcategory": "carne_suina",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p011",
+      "sku": "011",
+      "name": "Champignon Inteiro Predilecta",
+      "price": "7.90",
+      "unit": "UN",
+      "category": "mercearia",
+      "subcategory": "conservas",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p012",
+      "sku": "012",
+      "name": "Coca-Cola 350ml",
+      "price": "3.99",
+      "unit": "UN",
+      "category": "bebidas",
+      "subcategory": "refrigerantes",
+      "image": "assets/products/bebidas.png",
+      "featured": false
+    }
+  ]
+}

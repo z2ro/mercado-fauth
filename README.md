@@ -91,7 +91,7 @@ O exemplo completo, executável, está em [`examples/campaign.json`](examples/ca
 }
 ```
 
-O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `phone`, `instagram`) e `products`. `template` é opcional e aceita `supermarket_12`, `weekend_hero` ou `price_attack`. Payloads antigos sem intenção V2 explícita permanecem em `supermarket_12`, mesmo quando produtos possuem `featured=true`. Templates V2, `hero_products`, `featured_products` e `visual_direction` são opt-ins manuais. A direção automática exige `"art_direction_mode": "auto"`.
+O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `phone`, `instagram`) e `products`. `template` é opcional e aceita `supermarket_12`, `faith_reference_12`, `weekend_hero` ou `price_attack`. Payloads antigos sem intenção V2 explícita permanecem em `supermarket_12`, mesmo quando produtos possuem `featured=true`. Templates V2, `hero_products`, `featured_products` e `visual_direction` são opt-ins manuais. A direção automática exige `"art_direction_mode": "auto"`.
 
 Validações (HTTP **422**): exatamente 12 produtos, IDs únicos, nomes e unidades não vazios, categoria suportada, validade no formato dia/mês/ano e data real. Preço deve ser **string decimal positiva**, com no máximo duas casas decimais e oito dígitos totais. Números JSON, inclusive floats, são rejeitados. Não há arredondamento silencioso. Limites de texto: nome 70 caracteres, unidade 12 e demais campos comerciais 120. Campos desconhecidos são rejeitados.
 
@@ -140,6 +140,8 @@ O planner escolhe um pattern estrutural, posiciona até um hero e até dois feat
 `weekend_hero` reserva a metade superior esquerda para um hero grande e organiza as outras ofertas em blocos assimétricos. `price_attack` organiza 12 cards compactos em três faixas, com imagem e preço em composição horizontal. Defaults de cores, tipografia, espaçamento, raio, sombras e escalas por role estão centralizados em `backend/app/design/system.py` e são expostos aos templates como CSS variables.
 
 Veja [`campaign-weekend-hero.json`](examples/campaign-weekend-hero.json) e [`campaign-price-attack.json`](examples/campaign-price-attack.json). Para escolher o hero, informe `template: "weekend_hero"` e `hero_products: ["p001"]`; `featured_products` aceita até dois IDs distintos. `visual_direction` recebe mood e ênfase validados, sem texto livre nem alteração de conteúdo comercial.
+
+`faith_reference_12` é um template 4×3 opcional inspirado na referência do Mercado Fauth: fundo amarelo, faixas promocionais, cards verde/azul e footer com contatos/horários. Reutiliza o planner e as hard rules do grid legado; o padrão continua sendo `supermarket_12`. Seu exemplo está em [`faith-reference-first.json`](examples/faith-reference-first.json). Esse template aceita `campaign.secondary_phone` e `campaign.hours` (`weekdays`, `saturday`, `sunday`); ambos são opcionais e não alteram payloads antigos. Use-o somente em modo manual.
 
 ## AI Art Director e Visual QA
 

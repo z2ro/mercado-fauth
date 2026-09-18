@@ -8,6 +8,20 @@ from .design import TemplateName, VisualDirection
 from .product import Product, ResolvedProduct, Text
 
 
+class OperatingHours(BaseModel):
+    model_config = ConfigDict(frozen=True, extra='forbid')
+    weekdays: Text
+    saturday: Text
+    sunday: Text
+
+    @field_validator('weekdays', 'saturday', 'sunday')
+    @classmethod
+    def nonblank_hours(cls, value):
+        if not value.strip():
+            raise ValueError('Horário não pode ser vazio.')
+        return value
+
+
 class Campaign(BaseModel):
     model_config = ConfigDict(frozen=True, extra='forbid')
     title: Text
@@ -16,6 +30,8 @@ class Campaign(BaseModel):
     address: Text
     phone: Text
     instagram: Text
+    secondary_phone: Text | None = None
+    hours: OperatingHours | None = None
 
     @field_validator('valid_until')
     @classmethod
@@ -57,8 +73,10 @@ class BannerRequest(BaseModel):
             raise ValueError('IDs de hero e featured devem ser únicos e distintos.')
         if (hero | featured) - product_ids:
             raise ValueError('Direção visual referencia um produto inexistente.')
-        if self.template == 'supermarket_12' and (hero or featured or self.visual_direction):
-            raise ValueError('supermarket_12 mantém o layout legado e não aceita direção hero/featured.')
+        if self.template in {'supermarket_12', 'faith_reference_12'} and (hero or featured or self.visual_direction):
+            raise ValueError('Templates 4x3 não aceitam direção hero/featured.')
+        if self.template == 'faith_reference_12' and self.art_direction_mode != 'manual':
+            raise ValueError('faith_reference_12 requer art_direction_mode=manual.')
         if self.template == 'price_attack' and hero:
             raise ValueError('price_attack não aceita hero_products.')
         return self

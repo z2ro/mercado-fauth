@@ -45,10 +45,11 @@ def _legacy_html(request, design, asset_dir):
         if placement.featured != product.featured:
             raise ValueError('DesignSpec alterou destaque do produto.')
         cards.append({'product': product, 'placement': placement, 'price': format_price(product.price), 'image': _asset(product, asset_dir)})
-    return ENV.get_template('supermarket_12/template.html').render(
+    template = design.template
+    return ENV.get_template(f'{template}/template.html').render(
         campaign=request.campaign,
         cards=cards,
-        css=(TEMPLATE_DIR / 'supermarket_12' / 'style.css').read_text(),
+        css=(TEMPLATE_DIR / template / 'style.css').read_text(),
         design_tokens=DESIGN_SYSTEM.css_variables(),
         logo=_brand_logo(asset_dir),
     )
