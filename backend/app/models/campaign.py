@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .product import Product, Text
+from .product import Product, ResolvedProduct, Text
 
 
 class Campaign(BaseModel):
@@ -41,3 +41,7 @@ class BannerRequest(BaseModel):
         if len({p.id for p in products}) != len(products):
             raise ValueError('IDs devem ser únicos.')
         return products
+
+
+class ResolvedBannerRequest(BannerRequest):
+    products: tuple[ResolvedProduct, ...] = Field(min_length=12, max_length=12)

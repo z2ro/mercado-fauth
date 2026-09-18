@@ -7,10 +7,18 @@ services:
       BANNER_REMOVE_BACKGROUND: ${BANNER_REMOVE_BACKGROUND:-false}
       BANNER_ASSET_CACHE_DIR: /app/.cache/assets
       BANNER_ASSET_PADDING_RATIO: ${BANNER_ASSET_PADDING_RATIO:-0.04}
+      BANNER_AI_CLASSIFICATION_ENABLED: ${BANNER_AI_CLASSIFICATION_ENABLED:-false}
+      BANNER_AI_PROVIDER: ${BANNER_AI_PROVIDER:-}
+      BANNER_AI_MODEL: ${BANNER_AI_MODEL:-}
+      BANNER_AI_API_KEY: ${BANNER_AI_API_KEY:-}
+      BANNER_CLASSIFICATION_MIN_CONFIDENCE: ${BANNER_CLASSIFICATION_MIN_CONFIDENCE:-0.70}
+      BANNER_AI_TIMEOUT_SECONDS: ${BANNER_AI_TIMEOUT_SECONDS:-15}
+      BANNER_CLASSIFICATION_CACHE_DIR: /app/.cache/classifications
     volumes:
       - ./assets:/app/assets:ro
       - ./output:/app/output
       - asset-cache:/app/.cache/assets
+      - classification-cache:/app/.cache/classifications
     shm_size: 256mb
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -20,3 +28,4 @@ services:
 
 volumes:
   asset-cache:
+  classification-cache:

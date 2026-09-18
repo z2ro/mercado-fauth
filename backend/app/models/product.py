@@ -26,7 +26,7 @@ class Product(BaseModel):
     name: Annotated[str, StringConstraints(min_length=1, max_length=70)]
     price: Decimal = Field(gt=0, max_digits=8, decimal_places=2)
     unit: Annotated[str, StringConstraints(min_length=1, max_length=12)]
-    category: Category
+    category: Category | None = None
     subcategory: Text | None = None
     image: str = Field(max_length=512)
     featured: bool = False
@@ -44,3 +44,7 @@ class Product(BaseModel):
         if value is not None and not value.strip():
             raise ValueError('Texto não pode ser vazio.')
         return value
+
+
+class ResolvedProduct(Product):
+    category: Category

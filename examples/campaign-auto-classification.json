@@ -1,0 +1,120 @@
+{
+  "campaign": {
+    "title": "Ofertas da Semana",
+    "valid_until": "20/09/2026",
+    "brand": "Mercado Exemplo",
+    "address": "Av. Exemplo, 123",
+    "phone": "(41) 99999-9999",
+    "instagram": "@mercadoexemplo"
+  },
+  "products": [
+    {
+      "id": "p001",
+      "sku": "001",
+      "name": "Paleta bovina",
+      "price": "39.90",
+      "unit": "KG",
+      "image": "assets/products/acougue.png",
+      "featured": true
+    },
+    {
+      "id": "p002",
+      "sku": "002",
+      "name": "Pernil sem osso",
+      "price": "17.90",
+      "unit": "KG",
+      "image": "assets/products/acougue.png",
+      "featured": false
+    },
+    {
+      "id": "p003",
+      "sku": "003",
+      "name": "Pão francês",
+      "price": "9.90",
+      "unit": "KG",
+      "image": "assets/products/padaria.png",
+      "featured": false
+    },
+    {
+      "id": "p004",
+      "sku": "004",
+      "name": "Presunto",
+      "price": "8.99",
+      "unit": "200 G",
+      "image": "assets/products/frios.png",
+      "featured": false
+    },
+    {
+      "id": "p005",
+      "sku": "005",
+      "name": "Queijo",
+      "price": "12.90",
+      "unit": "300 G",
+      "image": "assets/products/frios.png",
+      "featured": false
+    },
+    {
+      "id": "p006",
+      "sku": "006",
+      "name": "Arroz",
+      "price": "24.90",
+      "unit": "5 KG",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p007",
+      "sku": "007",
+      "name": "Molho de tomate",
+      "price": "1.99",
+      "unit": "UN",
+      "image": "assets/products/mercearia.png",
+      "featured": false
+    },
+    {
+      "id": "p008",
+      "sku": "008",
+      "name": "Coca-Cola",
+      "price": "7.99",
+      "unit": "2 L",
+      "image": "assets/products/bebidas.png",
+      "featured": false
+    },
+    {
+      "id": "p009",
+      "sku": "009",
+      "name": "Banana",
+      "price": "4.90",
+      "unit": "KG",
+      "image": "assets/products/hortifruti.png",
+      "featured": false
+    },
+    {
+      "id": "p010",
+      "sku": "010",
+      "name": "Tomate",
+      "price": "6.90",
+      "unit": "KG",
+      "image": "assets/products/hortifruti.png",
+      "featured": false
+    },
+    {
+      "id": "p011",
+      "sku": "011",
+      "name": "Detergente",
+      "price": "2.49",
+      "unit": "500 ML",
+      "image": "assets/products/limpeza.png",
+      "featured": false
+    },
+    {
+      "id": "p012",
+      "sku": "012",
+      "name": "Shampoo",
+      "price": "13.90",
+      "unit": "350 ML",
+      "image": "assets/products/higiene.png",
+      "featured": false
+    }
+  ]
+}

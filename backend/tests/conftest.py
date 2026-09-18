@@ -21,3 +21,10 @@ def isolated_asset_cache(tmp_path, monkeypatch):
     from backend.app.assets import processor
     from backend.app.config import AssetSettings
     monkeypatch.setattr(processor, 'ASSET_SETTINGS', AssetSettings(cache_dir=tmp_path / 'cache'))
+
+
+@pytest.fixture(autouse=True)
+def isolated_classification(tmp_path, monkeypatch):
+    from backend.app.classification import resolver
+    from backend.app.config import ClassificationSettings
+    monkeypatch.setattr(resolver, 'CLASSIFICATION_SETTINGS', ClassificationSettings(cache_dir=tmp_path/'classifications'))

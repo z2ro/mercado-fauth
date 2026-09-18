@@ -1,11 +1,11 @@
 # promo-banner-ai
 
-MVP determinístico para transformar campanhas de supermercado em banners PNG de **1080 × 1080**. Sem IA generativa, banco ou filas. Remoção de fundo local opcional. O template é inspirado na estrutura de `referencia.jpeg`, com identidade própria: amarelo promocional, faixa de validade, cards claros, preços em verde e rodapé da loja.
+MVP determinístico para transformar campanhas de supermercado em banners PNG de **1080 × 1080**. Sem banco ou filas. Classificação opcional por LLM e remoção de fundo local; sem geração de imagens por IA. O template é inspirado na estrutura de `referencia.jpeg`, com identidade própria: amarelo promocional, faixa de validade, cards claros, preços em verde e rodapé da loja.
 
 ## Arquitetura
 
 ```text
-JSON → Pydantic → Layout Planner → DesignSpec → Jinja2/HTML/CSS → Chromium → PNG
+JSON → Pydantic → Classificação → ResolvedProduct → Layout Planner → DesignSpec → Jinja2/HTML/CSS → Chromium → PNG
 ```
 
 - `backend/app/models/`: modelos imutáveis, preços Decimal, contrato e DesignSpec.
@@ -92,7 +92,7 @@ O objeto raiz possui `campaign` (`title`, `valid_until`, `brand`, `address`, `ph
 
 Validações (HTTP **422**): exatamente 12 produtos, IDs únicos, nomes e unidades não vazios, categoria suportada, validade no formato dia/mês/ano e data real. Preço deve ser **string decimal positiva**, com no máximo duas casas decimais e oito dígitos totais. Números JSON, inclusive floats, são rejeitados. Não há arredondamento silencioso. Limites de texto: nome 70 caracteres, unidade 12 e demais campos comerciais 120. Campos desconhecidos são rejeitados.
 
-Categorias: `acougue`, `frios`, `padaria`, `hortifruti`, `mercearia`, `bebidas`, `limpeza`, `higiene`. A categoria é fornecida pelo usuário; não há classificação automática.
+Categorias: `acougue`, `frios`, `padaria`, `hortifruti`, `mercearia`, `bebidas`, `limpeza`, `higiene`. Categoria e subcategoria são opcionais. Quando presentes, têm precedência sobre a classificação automática.
 
 ## Layout Planner
 
@@ -157,7 +157,9 @@ O teste de POST usa Chromium real e verifica um PNG real. Portanto instale Playw
 
 **Real assets + visual quality — implementado e testado:** preparação de imagens reais, remoção local opcional, crop, padding, cache por conteúdo, composição por aspect ratio e exemplos sintéticos.
 
-**Fase 2 — restante:** classificação automática por IA e templates para 4, 6, 8 e 16 produtos.
+**Classificação automática — implementada e testada offline:** regras determinísticas, cache, interface batch e provider LLM opcional com Structured Outputs. A integração externa foi validada com transporte HTTP simulado; não foi efetuada chamada paga.
+
+**Fase 2 — restante:** templates para 4, 6, 8 e 16 produtos.
 
 **Fase 3:** OR-Tools, layouts assimétricos, produtos destacados ocupando dois slots. A separação entre grid, placements e renderer é o ponto de extensão; o contrato atual continua fixo em 12 slots.
 
@@ -234,3 +236,71 @@ curl --fail-with-body -sS -X POST http://localhost:8000/api/v1/banners \
 A suíte usa fakes para remoção, cache isolado por teste e nenhum download de modelos. O teste de integração incorpora 12 imagens, verifica que Chromium as carregou e que ficam isoladas dos textos, preserva os dados comerciais e gera PNG 1080×1080 real. A inferência real é validada separadamente da suíte offline.
 
 Limitações: U2NetP pode remover partes do produto ou deixar resíduos em fotos difíceis; avalie fotos representativas antes de ativar em produção. Transparência parcial é considerada conteúdo no crop. O canvas é limitado a 600×600, mas sua forma acompanha o produto; fotos muito pequenas permanecem pequenas para preservar qualidade. O pipeline é determinístico com o mesmo modelo, dependências e ambiente; não garante equivalência de pixels entre diferentes plataformas.
+
+
+## Classificação automática de produtos
+
+`category` e `subcategory` podem ser omitidas ou `null`. Categoria inválida continua sendo erro 422. A API resolve os produtos antes de executar o planner existente; `ResolvedProduct` exige categoria válida. O planner não recebe origem, confiança ou diagnóstico. A renderização, o DesignSpec e os dados comerciais continuam com os mesmos papéis.
+
+Ordem de resolução:
+
+1. Categoria manual tem precedência e nunca gera chamada de IA. Subcategoria manual é preservada literalmente. Se apenas subcategoria estiver ausente, uma regra compatível pode preenchê-la; caso contrário permanece `null`, sem impedir o banner.
+2. Cache validado e com confiança suficiente.
+3. Regra forte (confiança pelo menos 0,90 e acima do threshold configurado).
+4. Uma chamada batch ao LLM para todos os produtos restantes, somente com IA habilitada.
+5. Em erro, timeout, schema inválido ou baixa confiança, regra de fallback confiável.
+6. Sem classificação segura: HTTP 422 com os IDs dos produtos não resolvidos. Nenhuma categoria padrão é inventada.
+
+As regras estão em `backend/app/classification/rules.py`. Fazem comparação por palavras/frases normalizadas, sem acentos e sem distinção de maiúsculas. Frases específicas prevalecem sobre palavras contidas nelas: `água sanitária` é limpeza, `molho de tomate` é mercearia e `pão de queijo` é padaria. Matches conflitantes entre departamentos são recusados. Os pesos são heurísticos, não probabilidades calibradas. O vocabulário inicial tem limites: nomes desconhecidos ou ambíguos precisam de categoria manual ou IA; não há inferência silenciosa por default.
+
+### Provider opcional e dados enviados
+
+A interface `ProductClassifier` expõe `classify` e `classify_batch`. As implementações são `RuleBasedProductClassifier` e `LLMProductClassifier`. O provider inicial é `openai`, via Responses API e [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs), usando `httpx` já instalado. Outros providers podem implementar a interface sem alterar o planner.
+
+O prompt é versionado em `classification/llm.py`. O LLM recebe **somente product_id, name e unit** dos produtos pendentes. Não recebe SKU, preço, imagem, featured, dados da loja ou credenciais no prompt. Nomes são tratados como dados, nunca instruções. A saída aceita exclusivamente `product_id`, `category`, `subcategory` e `confidence`; campos extras são rejeitados. Não usamos justificativa livre (`reason`) no contrato do provider: o diagnóstico fica nos eventos e metadados, respeitando a restrição de saída exclusivamente classificatória.
+
+Pydantic valida as oito categorias, subcategoria em snake_case sem acentos ou null e confiança numérica finita entre 0 e 1. O batch exige exatamente os IDs solicitados: duplicados, desconhecidos ou faltantes invalidam o batch completo. Respostas recusadas/incompletas também falham. Nunca se extrai categoria de texto livre. Há timeout HTTP e limite total de espera do batch, sem retries automáticos.
+
+### Variáveis de classificação
+
+| Variável | Default | Uso |
+|---|---|---|
+| `BANNER_AI_CLASSIFICATION_ENABLED` | `false` | Habilita uso do provider externo |
+| `BANNER_AI_PROVIDER` | vazio | `openai` é o provider implementado |
+| `BANNER_AI_MODEL` | vazio | Modelo da conta com suporte a Structured Outputs; não há modelo implícito |
+| `BANNER_AI_API_KEY` | vazio | Segredo de execução, nunca versionar |
+| `BANNER_CLASSIFICATION_MIN_CONFIDENCE` | `0.70` | Número finito de 0 a 1; aplicado também a regras e cache |
+| `BANNER_AI_TIMEOUT_SECONDS` | `15` | Limite total do batch, maior que 0 e no máximo 120 segundos |
+| `BANNER_CLASSIFICATION_CACHE_DIR` | `.cache/classifications` | Cache local; no Compose, volume persistente `classification-cache` |
+
+Sem credencial, modelo ou provider suportado, o startup funciona. Produtos manuais e reconhecidos pelas regras continuam funcionando. Quando houver produto pendente, a tentativa de IA falha de forma controlada e segue para fallback/422. Configurações inválidas de threshold, timeout, booleano ou diretório vazio falham na inicialização. Reinicie o serviço depois de alterar a configuração.
+
+Para habilitar, forneça as variáveis no ambiente e execute `docker compose up -d`. Mantenha a chave fora do Git. O serviço usa `store: false` no request ao provider; isso não substitui as políticas de retenção da conta. Sem IA habilitada, nenhuma chamada de classificação sai para a internet.
+
+### Cache e observabilidade
+
+O cache usa SHA-256 do nome e unidade normalizados, espaço reservado para marca futura, versão do classificador/regras/prompt e provider/modelo/configuração de habilitação. **Preço, SKU e ID não fazem parte da chave**: o mesmo produto pode reutilizar a categoria com outro preço ou ID. Ao ler, a identidade da classificação é associada ao ID atual, e o threshold é verificado novamente.
+
+Cada JSON armazena categoria, subcategoria, confiança, identidade do classificador e versão. Escritas são atômicas; arquivos corrompidos são tratados como miss. Falha de escrita não impede o banner. Categorias manuais não alimentam o cache. Não há TTL; atualização de regras/prompt deve incrementar a respectiva versão. Cache de IA reduz variação em chamadas futuras, mas uma nova inferência externa não garante determinismo absoluto.
+
+Eventos JSON nos logs: `classification_user_provided`, `classification_cache_hit`, `classification_cache_miss`, `classification_rule_match`, `classification_ai_started`, `classification_ai_completed`, `classification_low_confidence`, `classification_ai_failed`, `classification_fallback`, `classification_unresolved`. Erros do provider registram somente o tipo da exceção, nunca mensagens potencialmente contendo segredos.
+
+A resposta existente ganha `classification`, indexado por ID:
+
+```json
+{"p001": {"category": "acougue", "subcategory": "carne_bovina", "source": "rule", "confidence": 0.95}}
+```
+
+`source` indica a origem da categoria (`user`, `cache`, `rule`, `ai`). Uma subcategoria manual preservada não altera a origem informada da categoria.
+
+### Exemplo totalmente offline
+
+[`examples/campaign-auto-classification.json`](examples/campaign-auto-classification.json) contém 12 produtos sem categoria nem subcategoria, incluindo pão francês. Funciona com os defaults, sem chave externa:
+
+```bash
+curl --fail-with-body -sS -X POST http://localhost:8000/api/v1/banners \
+  -H 'Content-Type: application/json' \
+  --data-binary @examples/campaign-auto-classification.json
+```
+
+Repita a chamada e observe `source: cache` e `classification_cache_hit`. A suíte usa `FakeProductClassifier`, `httpx.MockTransport` e caches temporários; não chama o provider real. Há testes de batch, timeout, falhas, threshold, preservação dos campos comerciais, integração com hard rules e screenshot Chromium 1080×1080.
